@@ -1,0 +1,270 @@
+<!-- Header -->
+<section class="sb-header">
+  <div class="container text-center">
+    <span class="section-label">Interactive Tool</span>
+    <h1 class="section-title">Strategy Builder</h1>
+    <p class="section-subtitle centered">
+      Input your project context and get a tailored AI workflow, tool stack, and constraint surface.
+    </p>
+  </div>
+</section>
+
+<!-- Progress Bar -->
+<div class="sb-progress">
+  <div class="container progress-track">
+    @for (label of stepLabels; track label; let i = $index) {
+      <div class="progress-step">
+        <div
+          class="step-circle"
+          [class.completed]="step() > i + 1"
+          [class.active]="step() === i + 1"
+        >
+          @if (step() > i + 1) {
+            <span>&#10003;</span>
+          } @else {
+            <span>{{ i + 1 }}</span>
+          }
+        </div>
+        <span class="step-label" [class.active]="step() === i + 1">{{ label }}</span>
+        @if (i < 3) {
+          <div class="step-connector" [class.completed]="step() > i + 1"></div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Steps Content -->
+<section class="section-padding sb-content">
+  <div class="container sb-container">
+
+    <!-- Step 1: Problem Framing -->
+    @if (step() === 1) {
+      <div class="animate-fade-in">
+        <h2 class="step-title">Step 1: Problem Framing</h2>
+
+        <div class="form-group">
+          <label class="form-label">What is the core problem you've been asked to solve?</label>
+          <textarea
+            class="form-textarea"
+            [value]="problem()"
+            (input)="problem.set($any($event.target).value)"
+            placeholder="Describe the problem you're tackling..."
+          ></textarea>
+        </div>
+
+        <div class="form-group-lg">
+          <label class="form-label">Who identified this problem?</label>
+          <div class="option-row">
+            @for (opt of ['Business / Client', 'End Users', 'Both']; track opt) {
+              <button
+                class="option-btn"
+                [class.selected]="problemSource() === opt"
+                (click)="problemSource.set(opt)"
+              >
+                {{ opt }}
+              </button>
+            }
+          </div>
+          @if (problemSource()) {
+            <p class="hint-box">{{ problemSourceHint() }}</p>
+          }
+        </div>
+
+        <button
+          class="btn-primary"
+          [disabled]="!canProceedStep1()"
+          [class.disabled]="!canProceedStep1()"
+          (click)="goToStep(2)"
+        >
+          Continue to Project Matrix &rarr;
+        </button>
+      </div>
+    }
+
+    <!-- Step 2: Project Matrix -->
+    @if (step() === 2) {
+      <div class="animate-fade-in">
+        <h2 class="step-title">Step 2: Project Matrix</h2>
+
+        @for (axis of matrixAxes(); track axis.label) {
+          <div class="form-group">
+            <label class="form-label">{{ axis.label }}</label>
+            <div class="option-row">
+              @for (opt of axis.options; track opt) {
+                <button
+                  class="option-btn sm"
+                  [class.selected]="axis.value() === opt"
+                  (click)="axis.setter(opt)"
+                >
+                  {{ opt }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="btn-row">
+          <button class="btn-secondary" (click)="goToStep(1)">&larr; Back</button>
+          <button
+            class="btn-primary"
+            [disabled]="!canProceedStep2()"
+            [class.disabled]="!canProceedStep2()"
+            (click)="goToStep(3)"
+          >
+            Continue to Stage Selection &rarr;
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Stage Selection -->
+    @if (step() === 3) {
+      <div class="animate-fade-in">
+        <h2 class="step-title">Step 3: Stage Selection</h2>
+        <p class="step-desc">
+          Recommended stages are pre-selected. Toggle stages on/off. Deselecting a recommended stage may affect quality.
+        </p>
+
+        <div class="stage-grid">
+          @for (stage of allStages; track stage) {
+            <button
+              class="stage-card"
+              [class.selected]="selectedStages().includes(stage)"
+              (click)="toggleStage(stage)"
+            >
+              <div class="stage-header">
+                <div
+                  class="stage-checkbox"
+                  [class.checked]="selectedStages().includes(stage)"
+                >
+                  @if (selectedStages().includes(stage)) {
+                    <span>&#10003;</span>
+                  }
+                </div>
+                <span class="stage-name">{{ stage }}</span>
+              </div>
+              @if (recommended().includes(stage)) {
+                <span class="stage-recommended">&#10022; Recommended</span>
+              }
+              @if (recommended().includes(stage) && !selectedStages().includes(stage)) {
+                <span class="stage-warning">Removing may reduce quality</span>
+              }
+            </button>
+          }
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-secondary" (click)="goToStep(2)">&larr; Back</button>
+          <button class="btn-primary" (click)="goToStep(4)">
+            Generate Strategy &rarr;
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 4: Strategy Output -->
+    @if (step() === 4) {
+      <div class="animate-fade-in">
+        <h2 class="step-title">Your AI Strategy</h2>
+
+        <!-- Project Summary -->
+        <div class="card output-card">
+          <h3 class="card-title">Project Summary</h3>
+          <div class="summary-content">
+            <p><strong>Problem:</strong> {{ problem() }}</p>
+            <p><strong>Source:</strong> {{ problemSource() }}</p>
+            <p><strong>Type:</strong> {{ projectType() }} &middot; {{ contractType() }} &middot; {{ timeline() }}</p>
+            <p><strong>Team:</strong> {{ teamSize() }} &middot; {{ orgType() }} &middot; Design System: {{ designSystem() }}</p>
+          </div>
+        </div>
+
+        <!-- Recommended Workflow -->
+        <div class="card output-card">
+          <h3 class="card-title">Recommended Workflow</h3>
+          <div class="workflow-list">
+            @for (stage of selectedStages(); track stage; let i = $index) {
+              <div class="workflow-item">
+                <span class="workflow-num">{{ i + 1 }}</span>
+                <span class="workflow-name">{{ stage }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- AI Tool Stack -->
+        <div class="card output-card">
+          <h3 class="card-title">AI Tool Stack</h3>
+          <div class="table-wrap">
+            <table class="tool-table">
+              <thead>
+                <tr>
+                  <th class="text-left">Tool</th>
+                  <th class="text-left">Phase</th>
+                  <th class="text-center">Free Tier</th>
+                  <th class="text-center">Client-Safe</th>
+                  <th class="text-center">Time Saving</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (t of toolStack(); track t.name + t.phase) {
+                  <tr>
+                    <td class="tool-name">{{ t.name }}</td>
+                    <td class="tool-phase">{{ t.phase }}</td>
+                    <td class="text-center">
+                      <span [class]="t.freemium ? 'badge-success' : 'badge-danger'">
+                        {{ t.freemium ? '\u2713 Yes' : '\u2717 No' }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span [class]="t.clientSafe ? 'badge-success' : 'badge-warning'">
+                        {{ t.clientSafe ? '\u2713 Safe' : '\u26A0 Review' }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge-saving">{{ t.timeSaving }}</span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Constraints -->
+        @if (constraints().length > 0) {
+          <div class="card output-card">
+            <h3 class="card-title">Constraint Surface</h3>
+            <div class="constraint-list">
+              @for (c of constraints(); track c) {
+                <div class="constraint-item">{{ c }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Reading Path -->
+        <div class="card output-card">
+          <h3 class="card-title">Reading Path</h3>
+          <p class="reading-desc">Based on your selected stages, read these wiki sections in order:</p>
+          <div class="reading-list">
+            @for (article of readingPath(); track article.slug; let i = $index) {
+              <a [routerLink]="['/wiki', article.slug]" class="reading-link">
+                <span class="reading-num">{{ i + 1 }}.</span>
+                <span class="reading-title">{{ article.title }}</span>
+                <span class="reading-arrow">&rarr;</span>
+              </a>
+            }
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="btn-row">
+          <button class="btn-secondary" (click)="goToStep(1)">Start Over</button>
+          <button class="btn-secondary" (click)="resetAll()">Reset All</button>
+        </div>
+      </div>
+    }
+
+  </div>
+</section>

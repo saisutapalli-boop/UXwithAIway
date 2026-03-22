@@ -1,0 +1,4 @@
+{
+  "angular.experimental.template-support": "ide-integrated",
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
