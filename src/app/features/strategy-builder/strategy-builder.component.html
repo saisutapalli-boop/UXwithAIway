@@ -258,6 +258,72 @@
           </div>
         </div>
 
+        <!-- Export to Google Slides -->
+        <div class="card output-card slides-export-card">
+          <div class="slides-export-header">
+            <div>
+              <h3 class="card-title">Export to Google Slides</h3>
+              <p class="slides-export-desc">
+                Generate a full strategy presentation — problem framing, workflow, tool stack, constraints, and a 3-phase action plan — ready to open in Google Slides.
+              </p>
+            </div>
+            <div class="slides-badge">
+              <span class="slides-count">{{ slides().length }} slides</span>
+            </div>
+          </div>
+
+          <!-- Slide preview toggle -->
+          <button class="slides-preview-toggle" (click)="showSlidePreview.set(!showSlidePreview())">
+            {{ showSlidePreview() ? '&#9650; Hide Preview' : '&#9660; Preview Slides' }}
+          </button>
+
+          @if (showSlidePreview()) {
+            <div class="slides-preview-grid">
+              @for (slide of slides(); track slide.title; let i = $index) {
+                <div class="slide-thumb">
+                  <div class="slide-thumb-num">{{ i + 1 }}</div>
+                  <div class="slide-thumb-title">{{ slide.title }}</div>
+                  @if (slide.subtitle) {
+                    <div class="slide-thumb-sub">{{ slide.subtitle }}</div>
+                  }
+                  @if (slide.bullets.length > 0) {
+                    <ul class="slide-thumb-bullets">
+                      @for (b of slide.bullets.slice(0, 3); track b) {
+                        <li>{{ b }}</li>
+                      }
+                      @if (slide.bullets.length > 3) {
+                        <li class="slide-thumb-more">+{{ slide.bullets.length - 3 }} more</li>
+                      }
+                    </ul>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- How-to steps -->
+          <div class="slides-steps">
+            <div class="slides-step"><span class="slides-step-num">1</span>Copy the Apps Script below</div>
+            <div class="slides-step"><span class="slides-step-num">2</span>Open <strong>script.google.com</strong> → New project</div>
+            <div class="slides-step"><span class="slides-step-num">3</span>Paste &amp; click ▶ Run — a Google Slides deck is created</div>
+          </div>
+
+          <button class="btn-slides" (click)="copyScript()">
+            @if (scriptCopied()) {
+              <span>&#10003; Copied!</span>
+            } @else {
+              <span>&#128203; Copy Google Apps Script</span>
+            }
+          </button>
+
+          <a
+            href="https://script.google.com"
+            target="_blank"
+            rel="noopener"
+            class="slides-open-link"
+          >Open script.google.com &rarr;</a>
+        </div>
+
         <!-- Actions -->
         <div class="btn-row">
           <button class="btn-secondary" (click)="goToStep(1)">Start Over</button>

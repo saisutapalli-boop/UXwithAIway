@@ -413,6 +413,25 @@ export class StrategyBuilderComponent {
     return articles;
   });
 
+  readonly actionPlan = computed(() =>
+    getActionPlan(this.selectedStages(), this.projectType(), this.timeline(), this.orgType(), this.problemSource())
+  );
+
+  readonly slides = computed(() =>
+    buildSlides(
+      this.problem(), this.problemSource(), this.problemSourceHint(),
+      this.projectType(), this.contractType(), this.timeline(),
+      this.teamSize(), this.orgType(), this.designSystem(),
+      this.selectedStages(), this.toolStack(), this.constraints(),
+      this.actionPlan(), this.readingPath()
+    )
+  );
+
+  readonly appsScript = computed(() => {
+    const title = `UX Strategy: ${this.problem().slice(0, 60)}`;
+    return generateAppsScript(this.slides(), title);
+  });
+
   readonly matrixAxes = computed(() => [
     { label: 'Project Type', options: this.projectTypes, value: this.projectType, setter: (v: string) => this.projectType.set(v) },
     { label: 'Contract Type', options: this.contractTypes, value: this.contractType, setter: (v: string) => this.contractType.set(v) },
@@ -434,6 +453,13 @@ export class StrategyBuilderComponent {
     this.selectedStages.update(prev =>
       prev.includes(stage) ? prev.filter(s => s !== stage) : [...prev, stage]
     );
+  }
+
+  copyScript(): void {
+    navigator.clipboard.writeText(this.appsScript()).then(() => {
+      this.scriptCopied.set(true);
+      setTimeout(() => this.scriptCopied.set(false), 3000);
+    });
   }
 
   resetAll(): void {
