@@ -9,6 +9,7 @@ export interface Tool {
   skillLevels: string[];
   description: string;
   link: string;
+  videos?: { title: string; url: string }[];
 }
 
 export interface ToolRec {

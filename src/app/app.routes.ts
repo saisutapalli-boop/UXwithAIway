@@ -23,15 +23,24 @@ export const routes: Routes = [
   },
   {
     path: 'contributor-hub',
-    loadComponent: () => import('./features/contributor-hub/contributor-hub.component').then(m => m.ContributorHubComponent),
+    redirectTo: '/about',
+    pathMatch: 'full',
   },
   {
     path: 'about',
     loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent),
   },
   {
+    path: 'approach',
+    loadComponent: () => import('./features/approach/approach.component').then(m => m.ApproachComponent),
+  },
+  {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES),
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
   },
   {
     path: '**',

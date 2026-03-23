@@ -129,7 +129,7 @@ import { AuthService } from '../../core/services/auth.service';
     }
 
     .provider-badge {
-      background: rgba(99, 102, 241, 0.1);
+      background: rgba(177, 0, 14, 0.08);
       color: var(--accent-primary);
       padding: 4px 12px;
       border-radius: var(--radius-full);

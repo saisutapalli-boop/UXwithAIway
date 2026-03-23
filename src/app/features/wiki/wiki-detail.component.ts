@@ -1,8 +1,11 @@
 import { Component, ChangeDetectionStrategy, inject, computed, signal, OnInit, DestroyRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ContentService } from '../../core/services/content.service';
+import { WikiSectionContent } from '../../core/models/wiki-section.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../core/services/auth.service';
+
+type WikiVideo = { title: string; watchUrl: string; thumbUrl: string };
 
 @Component({
   selector: 'app-wiki-detail',
@@ -111,21 +114,20 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
             <div class="content-block">
               <h2 class="content-heading">Watch It In Action</h2>
               <div class="videos-grid">
-                @for (v of c.videos; track v.url) {
-                  <div class="video-item">
-                    <p class="video-item-title">{{ v.title }}</p>
-                    <div class="video-wrapper">
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        [src]="$any(v).safeUrl"
-                        [title]="v.title"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen
-                      ></iframe>
+                @for (v of wikiVideos(); track v.watchUrl) {
+                  <a [href]="v.watchUrl" target="_blank" rel="noopener noreferrer" class="video-card">
+                    <div class="video-thumb-wrap">
+                      <img [src]="v.thumbUrl" [alt]="v.title" class="video-thumb" loading="lazy" />
+                      <div class="video-play-overlay">
+                        <svg class="play-icon" viewBox="0 0 68 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="68" height="48" rx="12" fill="rgba(0,0,0,0.7)"/>
+                          <path d="M26 15L50 24L26 33V15Z" fill="white"/>
+                        </svg>
+                      </div>
+                      <div class="video-watch-label">Watch on YouTube ↗</div>
                     </div>
-                  </div>
+                    <p class="video-item-title">{{ v.title }}</p>
+                  </a>
                 }
               </div>
             </div>
@@ -150,11 +152,82 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
               </div>
             }
 
+            <!-- Contribute section -->
+            <div class="content-block contribute-section">
+              <div class="contribute-header">
+                <div class="contribute-header-left">
+                  <h2 class="content-heading">Contribute to This Section</h2>
+                  <p class="contribute-subtitle">Help improve this wiki with your expertise and experience.</p>
+                </div>
+                @if (isLoggedIn() && !showContributeForm() && !contributeSubmitted()) {
+                  <button class="btn-primary contribute-btn" (click)="showContributeForm.set(true)">+ Contribute</button>
+                }
+              </div>
+
+              @if (!isLoggedIn()) {
+                <div class="contribute-login-prompt">
+                  <span class="contribute-lock">🔒</span>
+                  <div>
+                    <p class="contribute-login-text">Sign in to contribute your knowledge to this wiki section.</p>
+                    <a routerLink="/auth/login" class="contribute-login-link">Sign in to contribute &rarr;</a>
+                  </div>
+                </div>
+              } @else if (contributeSubmitted()) {
+                <div class="contribute-success">
+                  <span class="contribute-success-icon">✅</span>
+                  <div>
+                    <p class="contribute-success-title">Thank you for contributing!</p>
+                    <p class="contribute-success-text">Your submission has been received and will be reviewed by our team.</p>
+                    <button class="contribute-again-btn" (click)="resetContribution()">Submit Another</button>
+                  </div>
+                </div>
+              } @else if (showContributeForm()) {
+                <div class="card contribute-form-card">
+                  <p class="contribute-user-note">Contributing as <strong>{{ currentUser()?.displayName || currentUser()?.email }}</strong></p>
+
+                  <div class="contribute-field">
+                    <label class="contribute-label">Contribution Type</label>
+                    <div class="contribute-type-options">
+                      @for (type of contributeTypes; track type) {
+                        <button
+                          class="contribute-type-btn"
+                          [class.active]="contributeType() === type"
+                          (click)="contributeType.set(type)"
+                        >{{ type }}</button>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="contribute-field">
+                    <label class="contribute-label">Your Contribution</label>
+                    <textarea
+                      class="contribute-textarea"
+                      [value]="contributeContent()"
+                      (input)="contributeContent.set($any($event.target).value)"
+                      placeholder="Share your knowledge, corrections, additional tools, or real-world examples..."
+                      rows="5"
+                    ></textarea>
+                  </div>
+
+                  <div class="contribute-actions">
+                    <button class="contribute-cancel-btn" (click)="showContributeForm.set(false)">Cancel</button>
+                    <button
+                      class="btn-primary contribute-submit-btn"
+                      (click)="submitContribution()"
+                      [disabled]="!contributeType() || !contributeContent().trim() || contributeLoading()"
+                    >
+                      @if (contributeLoading()) { Submitting... } @else { Submit Contribution }
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
             <!-- Template Download -->
             <div class="card template-card">
               <h3 class="template-title">Downloadable Template</h3>
               <p class="template-desc">Ready-to-use Figma and Notion templates for this phase.</p>
-              <button class="btn-primary template-btn" disabled>Coming Soon - Phase 2</button>
+              <button class="btn-primary template-btn" disabled>Coming Soon. Phase 2</button>
             </div>
           } @else {
             <div class="no-content">
@@ -347,7 +420,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       font-size: 0.7rem;
       font-weight: 600;
       color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.08);
+      background: rgba(177, 0, 14, 0.06);
       padding: 3px 8px;
       border-radius: var(--radius-full);
     }
@@ -418,36 +491,81 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
     .videos-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
     }
 
-    .video-item {
+    .video-card {
+      text-decoration: none;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
+      border-radius: var(--radius-md);
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+
+        .video-watch-label { opacity: 1; }
+        .video-thumb { transform: scale(1.03); }
+        .play-icon rect { fill: rgba(177,0,14,0.85); }
+      }
+    }
+
+    .video-thumb-wrap {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+    }
+
+    .video-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .video-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .play-icon {
+      width: 60px;
+      height: 42px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      transition: all 0.2s ease;
+    }
+
+    .video-watch-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.75));
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      text-align: right;
     }
 
     .video-item-title {
-      font-size: 0.8rem;
+      font-size: 0.83rem;
       font-weight: 600;
       color: var(--text-secondary);
-      line-height: 1.4;
-      min-height: 2.8em;
-    }
-
-    .video-wrapper {
-      aspect-ratio: 16 / 9;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-md);
-      background: var(--bg-tertiary);
-    }
-
-    .video-wrapper iframe {
-      border: none;
-      display: block;
+      line-height: 1.45;
+      margin: 0;
     }
 
     .resources-list {
@@ -477,7 +595,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
     .resource-icon {
       font-size: 1.5rem;
-      background: rgba(99, 102, 241, 0.1);
+      background: rgba(177, 0, 14, 0.08);
       width: 44px;
       height: 44px;
       border-radius: var(--radius-md);
@@ -582,38 +700,266 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       font-size: 2rem;
       margin-bottom: 16px;
     }
+
+    /* ── Contribute section ── */
+    .contribute-section {
+      border-top: 1px solid var(--border-color);
+      padding-top: 32px;
+    }
+
+    .contribute-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .contribute-header-left .content-heading {
+      margin-bottom: 4px;
+    }
+
+    .contribute-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+
+    .contribute-btn {
+      padding: 10px 20px;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .contribute-login-prompt {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+    }
+
+    .contribute-lock {
+      font-size: 1.8rem;
+      flex-shrink: 0;
+    }
+
+    .contribute-login-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0 0 6px;
+    }
+
+    .contribute-login-link {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    .contribute-success {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 24px;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: var(--radius-lg);
+    }
+
+    .contribute-success-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .contribute-success-title {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 4px;
+      font-size: 0.95rem;
+    }
+
+    .contribute-success-text {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin: 0 0 12px;
+    }
+
+    .contribute-again-btn {
+      background: none;
+      border: none;
+      color: var(--accent-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      font-family: var(--font-sans);
+    }
+
+    .contribute-form-card {
+      padding: 24px;
+    }
+
+    .contribute-user-note {
+      font-size: 0.83rem;
+      color: var(--text-tertiary);
+      margin: 0 0 20px;
+
+      strong {
+        color: var(--text-secondary);
+      }
+    }
+
+    .contribute-field {
+      margin-bottom: 18px;
+    }
+
+    .contribute-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .contribute-type-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .contribute-type-btn {
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.83rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+
+      &:hover {
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+      }
+
+      &.active {
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
+        color: #fff;
+      }
+    }
+
+    .contribute-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+
+      &:focus {
+        border-color: var(--accent-primary);
+      }
+
+      &::placeholder {
+        color: var(--text-tertiary);
+      }
+    }
+
+    .contribute-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .contribute-cancel-btn {
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+      }
+    }
+
+    .contribute-submit-btn {
+      padding: 10px 24px;
+      font-size: 0.88rem;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
   `],
 })
 export class WikiDetailComponent implements OnInit {
   private readonly content = inject(ContentService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly sanitizer = inject(DomSanitizer);
-
-  sanitizeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  }
+  private readonly authService = inject(AuthService);
 
   readonly slug = signal('');
+
+  readonly isLoggedIn = computed(() => this.authService.isLoggedIn());
+  readonly currentUser = computed(() => this.authService.user());
+
+  // Contribution form signals
+  readonly showContributeForm = signal(false);
+  readonly contributeType = signal('');
+  readonly contributeContent = signal('');
+  readonly contributeSubmitted = signal(false);
+  readonly contributeLoading = signal(false);
+
+  readonly contributeTypes = ['Additional Tool', 'Content Correction', 'New Example', 'Resource Link', 'Workflow Step'];
 
   readonly section = computed(() => {
     const s = this.slug();
     return s ? this.content.getWikiSectionBySlug(s) : undefined;
   });
 
-  readonly sectionContent = computed(() => {
+  readonly sectionContent = computed((): WikiSectionContent | undefined => {
     const s = this.slug();
-    const content = s ? this.content.getWikiSectionContent(s) : undefined;
-    if (content && content.videos) {
+    return s ? this.content.getWikiSectionContent(s) : undefined;
+  });
+
+  readonly wikiVideos = computed((): WikiVideo[] => {
+    const raw = this.sectionContent();
+    if (!raw?.videos?.length) return [];
+    return raw.videos.map(v => {
+      const id = v.url.split('/embed/')[1]?.split('?')[0] ?? '';
       return {
-        ...content,
-        videos: content.videos.map(v => ({
-          ...v,
-          safeUrl: this.sanitizer.bypassSecurityTrustResourceUrl(v.url)
-        }))
+        title: v.title,
+        watchUrl: `https://www.youtube.com/watch?v=${id}`,
+        thumbUrl: `https://img.youtube.com/vi/${id}/mqdefault.jpg`,
       };
-    }
-    return content;
+    });
   });
 
   readonly prevSection = computed(() => {
@@ -632,5 +978,24 @@ export class WikiDetailComponent implements OnInit {
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => this.slug.set(params['slug'] ?? ''));
+  }
+
+  submitContribution(): void {
+    if (!this.contributeType() || !this.contributeContent().trim()) return;
+    this.contributeLoading.set(true);
+    // Simulate submission (Firestore integration ready for Phase 2)
+    setTimeout(() => {
+      this.contributeLoading.set(false);
+      this.contributeSubmitted.set(true);
+      this.contributeType.set('');
+      this.contributeContent.set('');
+    }, 800);
+  }
+
+  resetContribution(): void {
+    this.contributeSubmitted.set(false);
+    this.showContributeForm.set(false);
+    this.contributeType.set('');
+    this.contributeContent.set('');
   }
 }

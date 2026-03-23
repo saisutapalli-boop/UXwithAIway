@@ -30,24 +30,17 @@
 }
 
 .logo-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--accent-gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 800;
-  font-size: 0.85rem;
-  font-family: var(--font-heading);
+  display: block;
+  flex-shrink: 0;
+  border-radius: 9px;
+  overflow: hidden;
 }
 
 .logo-text {
   font-family: var(--font-heading);
   font-weight: 800;
   font-size: 1.15rem;
-  background: linear-gradient(135deg, #FF41F8, #7702FF, #FF8008);
+  background: linear-gradient(135deg, #b1000e 0%, #d4182a 50%, #32373c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

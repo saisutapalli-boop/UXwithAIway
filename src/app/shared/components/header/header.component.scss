@@ -29,24 +29,17 @@
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--accent-gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 800;
-  font-size: 1rem;
-  font-family: var(--font-heading);
+  display: block;
+  flex-shrink: 0;
+  border-radius: 9px;
+  overflow: hidden;
 }
 
 .logo-text {
   font-family: var(--font-heading);
   font-weight: 800;
   font-size: 1.25rem;
-  background: linear-gradient(135deg, #FF41F8, #7702FF, #FF8008);
+  background: linear-gradient(135deg, #b1000e 0%, #d4182a 50%, #32373c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -72,6 +65,23 @@
   &.active {
     background: var(--bg-tertiary);
     color: var(--accent-primary);
+  }
+}
+
+.admin-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(177, 0, 14, 0.06);
+  border: 1px solid rgba(177, 0, 14, 0.2);
+  color: var(--accent-primary) !important;
+  font-weight: 600 !important;
+
+  &:hover,
+  &.active {
+    background: var(--accent-primary) !important;
+    color: #fff !important;
+    border-color: var(--accent-primary) !important;
   }
 }
 

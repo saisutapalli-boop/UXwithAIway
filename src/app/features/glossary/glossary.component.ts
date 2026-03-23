@@ -8,6 +8,18 @@ import { ContentService } from '../../core/services/content.service';
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar">
+      <div class="container">
+        <nav class="breadcrumb">
+          <a routerLink="/about" class="breadcrumb-link">About</a>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-current">Glossary</span>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Header -->
     <section class="glossary-header">
       <div class="container text-center">
         <span class="section-label">Reference</span>
@@ -28,6 +40,7 @@ import { ContentService } from '../../core/services/content.service';
 
     <section class="section-padding glossary-body">
       <div class="container glossary-container">
+
         <!-- Letter quick nav -->
         <div class="letter-nav">
           @for (letter of letters(); track letter) {
@@ -54,6 +67,7 @@ import { ContentService } from '../../core/services/content.service';
             <p>No terms match your search.</p>
           </div>
         }
+
       </div>
     </section>
   `,
@@ -63,6 +77,41 @@ import { ContentService } from '../../core/services/content.service';
     .text-center { text-align: center; }
     .centered { margin: 0 auto 28px; }
 
+    /* ── Breadcrumb ── */
+    .breadcrumb-bar {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .breadcrumb-link {
+      font-size: 0.84rem;
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+
+      &:hover { opacity: 0.75; }
+    }
+
+    .breadcrumb-sep {
+      font-size: 0.84rem;
+      color: var(--text-tertiary);
+    }
+
+    .breadcrumb-current {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    /* ── Header ── */
     .glossary-header {
       padding: 48px 24px 32px;
       background: var(--bg-secondary);
@@ -82,18 +131,12 @@ import { ContentService } from '../../core/services/content.service';
       transition: border-color 0.2s ease;
       box-sizing: border-box;
 
-      &:focus {
-        border-color: var(--accent-primary);
-      }
+      &:focus { border-color: var(--accent-primary); }
     }
 
-    .glossary-body {
-      background: var(--bg-primary);
-    }
-
-    .glossary-container {
-      max-width: 860px;
-    }
+    /* ── Body ── */
+    .glossary-body { background: var(--bg-primary); }
+    .glossary-container { max-width: 860px; }
 
     .letter-nav {
       display: flex;
@@ -117,15 +160,10 @@ import { ContentService } from '../../core/services/content.service';
       text-decoration: none;
       transition: all 0.2s ease;
 
-      &:hover {
-        background: var(--accent-primary);
-        color: #fff;
-      }
+      &:hover { background: var(--accent-primary); color: #fff; }
     }
 
-    .letter-group {
-      margin-bottom: 32px;
-    }
+    .letter-group { margin-bottom: 32px; }
 
     .letter-heading {
       font-size: 1.5rem;
@@ -136,15 +174,9 @@ import { ContentService } from '../../core/services/content.service';
       border-bottom: 2px solid var(--border-color);
     }
 
-    .terms-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    .terms-list { display: flex; flex-direction: column; gap: 12px; }
 
-    .term-card {
-      padding: 20px;
-    }
+    .term-card { padding: 20px; }
 
     .term-name {
       font-size: 1rem;
@@ -165,11 +197,7 @@ import { ContentService } from '../../core/services/content.service';
       text-align: center;
       padding: 60px 20px;
 
-      p {
-        color: var(--text-tertiary);
-        font-size: 1rem;
-        margin: 0;
-      }
+      p { color: var(--text-tertiary); font-size: 1rem; margin: 0; }
     }
   `],
 })

@@ -73,7 +73,7 @@ export class FeaturesSectionComponent {
   readonly features = [
     { icon: '\u{1F3AF}', title: 'Strategy Builder', desc: 'Input your project context - get a tailored AI workflow, tool stack, and constraint surface specific to your situation.' },
     { icon: '\u{1F4D6}', title: 'Practitioner Wiki', desc: '8 sections covering every UX phase, with AI workflows, real tool recommendations, and honest assessments.' },
-    { icon: '\u{1F6E0}\uFE0F', title: 'Tool Directory', desc: '20+ AI tools curated for UX - with freemium flags, client-safety ratings, and phase-specific recommendations.' },
+    { icon: '\u{1F6E0}\uFE0F', title: 'Tool Directory', desc: '50+ AI tools curated for UX - with freemium flags, client-safety ratings, and phase-specific recommendations.' },
     { icon: '\u{1F4D0}', title: 'Skill Level Filters', desc: 'Content tagged Junior, Mid, or Senior. See what matters for your experience level.' },
     { icon: '\u{1F91D}', title: 'Contributor Hub', desc: 'Invite-only practitioner contributors ensure quality. No vendor influence, no marketing language.' },
     { icon: '\u{1F4CA}', title: 'Impact Metrics', desc: 'Real numbers: 70% research reduction, 60% audit acceleration, 3\u00D7 solo output. Proven by practitioners.' },

@@ -12,7 +12,11 @@ import { csrfInterceptor } from './core/interceptors/csrf.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideRouter(
+      routes,
+      withPreloading(PreloadAllModules),
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' })
+    ),
     provideHttpClient(
       withInterceptors([csrfInterceptor]),
       withXsrfConfiguration({

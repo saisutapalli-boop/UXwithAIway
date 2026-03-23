@@ -124,7 +124,7 @@ import { RouterLink } from '@angular/router';
 
     .hero-btn-primary {
       background: #fff !important;
-      color: #4f46e5 !important;
+      color: #b1000e !important;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
 

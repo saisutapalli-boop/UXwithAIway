@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { GeminiService } from '../../core/services/gemini.service';
 
 interface ToolRec {
   name: string;
@@ -23,10 +24,31 @@ const ORG_TYPES = ['In-house Product', 'Service Design Consultancy', 'Agency', '
 const DESIGN_SYSTEM_OPTIONS = ['None', 'Partial / Inconsistent', 'Established'];
 
 const ALL_STAGES = [
-  'Problem Framing', 'Stakeholder Alignment', 'Secondary Research', 'Primary Research',
-  'Insight Synthesis', 'UX Strategy & Direction', 'Ideation & Concepts',
-  'Lo-fi Prototyping', 'Hi-fi Design & System Integration', 'Usability Testing',
-  'A/B Testing', 'Heuristic Evaluation', 'Handoff & Documentation',
+  'Problem Framing',
+  'Stakeholder Alignment',
+  'Research Planning',
+  'Competitive Analysis',
+  'Secondary Research',
+  'Primary Research',
+  'Quantitative Research',
+  'Jobs-to-be-Done (JTBD) Mapping',
+  'Insight Synthesis',
+  'User Journey Mapping',
+  'Service Blueprint',
+  'Workshop Facilitation',
+  'UX Strategy & Direction',
+  'Ideation & Concepts',
+  'Lo-fi Prototyping',
+  'Prototype Validation',
+  'Content Strategy',
+  'Hi-fi Design & System Integration',
+  'Design QA',
+  'Moderated Usability Testing',
+  'Unmoderated Usability Testing',
+  'A/B Testing',
+  'Heuristic Evaluation',
+  'Accessibility Audit',
+  'Handoff & Documentation',
   'Measurement & Continuous Improvement',
 ];
 
@@ -34,16 +56,27 @@ const STEP_LABELS = ['Problem Framing', 'Project Matrix', 'Stage Selection'];
 
 function getRecommendedStages(projectType: string, timeline: string): string[] {
   if (projectType.startsWith('UX Audit')) {
-    return ['Problem Framing', 'Stakeholder Alignment', 'Secondary Research', 'Heuristic Evaluation', 'Handoff & Documentation'];
+    return [
+      'Problem Framing', 'Stakeholder Alignment', 'Competitive Analysis',
+      'Secondary Research', 'Heuristic Evaluation', 'Accessibility Audit',
+      'Handoff & Documentation',
+    ];
   }
   if (projectType.startsWith('RFE')) {
-    return ['Problem Framing', 'Secondary Research', 'Primary Research', 'Insight Synthesis',
-      'Ideation & Concepts', 'Lo-fi Prototyping', 'Usability Testing', 'Handoff & Documentation'];
+    return [
+      'Problem Framing', 'Research Planning', 'Secondary Research', 'Primary Research',
+      'Jobs-to-be-Done (JTBD) Mapping', 'Insight Synthesis', 'User Journey Mapping',
+      'Ideation & Concepts', 'Lo-fi Prototyping', 'Prototype Validation',
+      'Moderated Usability Testing', 'Handoff & Documentation',
+    ];
   }
   // Initiative
   if (timeline.startsWith('Sprint')) {
-    return ['Problem Framing', 'Secondary Research', 'Primary Research', 'Insight Synthesis',
-      'Ideation & Concepts', 'Lo-fi Prototyping', 'Usability Testing'];
+    return [
+      'Problem Framing', 'Research Planning', 'Secondary Research', 'Primary Research',
+      'Insight Synthesis', 'Ideation & Concepts', 'Lo-fi Prototyping',
+      'Prototype Validation', 'Unmoderated Usability Testing',
+    ];
   }
   return ALL_STAGES;
 }
@@ -74,7 +107,19 @@ function getToolStack(stages: string[], contract: string, org: string): ToolRec[
     tools.push({ name: 'v0 by Vercel', phase: 'Design', freemium: true, clientSafe: true, timeSaving: '~55%' });
     tools.push({ name: 'Figma AI', phase: 'Design', freemium: true, clientSafe: true, timeSaving: '~45%' });
   }
-  if (stages.includes('Usability Testing') || stages.includes('A/B Testing')) {
+  if (stages.includes('User Journey Mapping')) {
+    tools.push({ name: 'Miro AI', phase: 'Journey Mapping', freemium: true, clientSafe: true, timeSaving: '~45%' });
+  }
+  if (stages.includes('Competitive Analysis')) {
+    tools.push({ name: 'Perplexity', phase: 'Competitive Research', freemium: true, clientSafe: true, timeSaving: '~70%' });
+  }
+  if (stages.includes('Quantitative Research')) {
+    tools.push({ name: 'Microsoft Clarity', phase: 'Analytics', freemium: true, clientSafe: true, timeSaving: '~50%' });
+  }
+  if (stages.includes('Accessibility Audit')) {
+    tools.push({ name: 'Axe DevTools', phase: 'Accessibility', freemium: true, clientSafe: true, timeSaving: '~55%' });
+  }
+  if (stages.includes('Moderated Usability Testing') || stages.includes('Unmoderated Usability Testing') || stages.includes('A/B Testing')) {
     tools.push({ name: 'Maze', phase: 'Testing', freemium: true, clientSafe: true, timeSaving: '~60%' });
     tools.push({ name: 'Microsoft Clarity', phase: 'Analytics', freemium: true, clientSafe: true, timeSaving: '~50%' });
   }
@@ -107,7 +152,15 @@ function getActionPlan(
 
   if (stages.includes('Problem Framing') || stages.includes('Stakeholder Alignment')) {
     now.push('Schedule a 30-min stakeholder kickoff to align on problem scope');
-    week1.push('Run problem framing workshop — map assumptions vs. knowns');
+    week1.push('Run a problem framing workshop to map assumptions versus knowns');
+  }
+  if (stages.includes('Research Planning')) {
+    now.push('Draft a research plan including objectives, methods, timeline, and recruitment criteria');
+    week1.push('Get research plan sign-off from stakeholders before fieldwork begins');
+  }
+  if (stages.includes('Competitive Analysis')) {
+    week1.push('Benchmark 3 to 5 competitors with Perplexity to create a feature matrix and identify UX patterns');
+    week1.push('Identify white space opportunities from competitive landscape');
   }
   if (stages.includes('Secondary Research')) {
     now.push('Set up Perplexity / Elicit research prompts for desk research');
@@ -118,9 +171,28 @@ function getActionPlan(
     week1.push('Use Claude to generate interview questions from the problem statement');
     month1.push('Complete interview rounds and transcribe with Otter.ai');
   }
+  if (stages.includes('Quantitative Research')) {
+    week1.push('Set up analytics dashboards (Microsoft Clarity / GA4) to capture behavioural data');
+    month1.push('Analyse quantitative data alongside qualitative findings for triangulation');
+  }
+  if (stages.includes('Jobs-to-be-Done (JTBD) Mapping')) {
+    week1.push('Run a JTBD interview analysis to extract functional, emotional, and social jobs');
+    month1.push('Map JTBD statements to product opportunities');
+  }
   if (stages.includes('Insight Synthesis')) {
     week1.push('Cluster findings with Miro AI affinity mapping');
-    month1.push('Write insight statements — problem → insight → opportunity format');
+    month1.push('Write insight statements using the problem, insight, and opportunity format');
+  }
+  if (stages.includes('User Journey Mapping')) {
+    month1.push('Co-create a current-state journey map with the team using real research data');
+    month1.push('Identify top 3 pain points to address in the future-state map');
+  }
+  if (stages.includes('Service Blueprint')) {
+    month1.push('Extend the journey map into a service blueprint covering frontstage and backstage actions');
+  }
+  if (stages.includes('Workshop Facilitation')) {
+    week1.push('Plan a cross-functional workshop including the agenda, activities, and desired outcomes');
+    month1.push('Facilitate workshop and document decisions and action items');
   }
   if (stages.includes('Ideation & Concepts')) {
     month1.push('Run ideation sprint with ChatGPT for rapid concept generation');
@@ -130,8 +202,32 @@ function getActionPlan(
     month1.push('Build lo-fi wireframes in Figma or v0 by Vercel');
     month1.push('Validate prototype with 3–5 users before hi-fi investment');
   }
+  if (stages.includes('Prototype Validation')) {
+    month1.push('Run 3 to 5 prototype tests to capture task success, errors, and verbal feedback');
+    month1.push('Iterate on prototype before committing to hi-fi design');
+  }
+  if (stages.includes('Content Strategy')) {
+    month1.push('Audit existing content and define tone of voice, hierarchy, and IA');
+    month1.push('Create content templates aligned to design components');
+  }
   if (stages.includes('Hi-fi Design & System Integration')) {
     month1.push('Apply design system tokens and hand off annotated specs');
+  }
+  if (stages.includes('Design QA')) {
+    month1.push('Run a design QA checklist covering spacing, colour tokens, responsive breakpoints, and accessibility');
+    month1.push('Sign off designs with dev team before handoff');
+  }
+  if (stages.includes('Moderated Usability Testing')) {
+    month1.push('Recruit 5–8 participants and run moderated usability sessions via Maze or Lookback');
+    month1.push('Debrief sessions and synthesise findings into a priority matrix');
+  }
+  if (stages.includes('Unmoderated Usability Testing')) {
+    month1.push('Set up a Maze unmoderated test including tasks, success criteria, and a screener');
+    month1.push('Analyse completion rates and time-on-task for quick iterations');
+  }
+  if (stages.includes('Accessibility Audit')) {
+    month1.push('Run an automated accessibility scan with Axe DevTools to fix all critical issues');
+    month1.push('Conduct manual keyboard and screen-reader walkthrough');
   }
   if (stages.includes('Heuristic Evaluation')) {
     now.push('Use Claude to generate a heuristic evaluation checklist for the product');
@@ -205,7 +301,7 @@ function buildSlides(
     {
       title: 'AI Tool Stack',
       subtitle: 'Tools matched to your context',
-      bullets: tools.map(t => `${t.name}  –  ${t.phase}  (saves ${t.timeSaving})`),
+      bullets: tools.map(t => `${t.name} for the ${t.phase} phase which saves ${t.timeSaving}`),
     },
     ...(constraints.length > 0
       ? [{
@@ -215,18 +311,18 @@ function buildSlides(
         }]
       : []),
     {
-      title: 'Action Plan — What To Do Now',
+      title: 'Action Plan: What To Do Now',
       subtitle: 'Immediate actions (Day 1)',
       bullets: actionPlan.now,
     },
     {
-      title: 'Action Plan — Week 1',
+      title: 'Action Plan: Week 1',
       subtitle: 'First-week milestones',
       bullets: actionPlan.week1,
     },
     ...(actionPlan.month1.length > 0
       ? [{
-          title: 'Action Plan — Month 1',
+          title: 'Action Plan: Month 1',
           subtitle: 'Delivery milestones',
           bullets: actionPlan.month1,
         }]
@@ -265,7 +361,7 @@ function generateAppsScript(slides: SlideData[], presentationTitle: string): str
   });
 
   return `// ─────────────────────────────────────────────────
-// UX Strategy Builder — Google Slides Generator
+// UX Strategy Builder: Google Slides Generator
 // Generated by UX with AI
 //
 // HOW TO USE:
@@ -299,7 +395,7 @@ function getConstraints(projectType: string, contract: string, org: string, desi
   }
   if (org === 'Service Design Consultancy') {
     constraints.push('Consultancy: Verify client data handling requirements before using any AI tool with user data.');
-    constraints.push('Async-first: Shift to async methods by default. Stakeholder access typically limited to 2\u20133 touchpoints per phase.');
+    constraints.push('Async-first: Shift to async methods by default. Stakeholder access is typically limited to 2 to 3 touchpoints per phase.');
     constraints.push('Procurement: No tool requiring enterprise procurement appears without a freemium alternative.');
     constraints.push('Stakeholder limits: Methods designed around limited availability, not against it.');
   }
@@ -323,6 +419,7 @@ function getConstraints(projectType: string, contract: string, org: string, desi
 })
 export class StrategyBuilderComponent {
   private authService = inject(AuthService);
+  private geminiService = inject(GeminiService);
 
   // Auth state
   readonly isLoggedIn = computed(() => this.authService.isLoggedIn());
@@ -353,6 +450,7 @@ export class StrategyBuilderComponent {
 
   // Step 3
   readonly selectedStages = signal<string[]>([]);
+  readonly stageSearch = signal('');
   private stagesInitialized = false;
 
   // Computed
@@ -368,6 +466,12 @@ export class StrategyBuilderComponent {
   readonly recommended = computed(() =>
     getRecommendedStages(this.projectType(), this.timeline())
   );
+
+  readonly filteredStages = computed(() => {
+    const q = this.stageSearch().toLowerCase().trim();
+    if (!q) return ALL_STAGES;
+    return ALL_STAGES.filter(s => s.toLowerCase().includes(q));
+  });
 
   readonly toolStack = computed(() =>
     getToolStack(this.selectedStages(), this.contractType(), this.orgType())
@@ -392,6 +496,11 @@ export class StrategyBuilderComponent {
 
   readonly scriptCopied = signal(false);
   readonly showSlidePreview = signal(false);
+
+  // AI Insights (Gemini)
+  readonly aiInsights = signal('');
+  readonly aiInsightsLoading = signal(false);
+  readonly aiInsightsError = signal(false);
 
   readonly readingPath = computed((): ReadingPathArticle[] => {
     const stages = this.selectedStages();
@@ -454,12 +563,54 @@ export class StrategyBuilderComponent {
       this.stagesInitialized = true;
     }
     this.step.set(s);
+    if (s === 4) {
+      this.generateAIInsights();
+    }
+  }
+
+  generateAIInsights(): void {
+    this.aiInsights.set('');
+    this.aiInsightsLoading.set(true);
+    this.aiInsightsError.set(false);
+
+    const prompt = `You are a senior UX consultant. Based on the following project context, provide 3-4 concise, actionable AI-powered strategy insights specific to this project. Focus on practical recommendations for the UX workflow.
+
+Problem: ${this.problem()}
+Problem Source: ${this.problemSource()}
+Project Type: ${this.projectType()}
+Contract Type: ${this.contractType()}
+Timeline: ${this.timeline()}
+Team Size: ${this.teamSize()}
+Organisation Type: ${this.orgType()}
+Design System: ${this.designSystem()}
+Selected Stages: ${this.selectedStages().join(', ')}
+
+Provide 3-4 actionable insights as a plain text list. Each insight should start with a short bold title in ALL CAPS followed by a colon, then 1-2 sentences. No markdown, no asterisks, no bullet symbols - just plain text with each insight on its own line.`;
+
+    this.geminiService.generateInsights(prompt).subscribe({
+      next: (result) => {
+        this.aiInsights.set(result);
+        this.aiInsightsLoading.set(false);
+      },
+      error: () => {
+        this.aiInsightsError.set(true);
+        this.aiInsightsLoading.set(false);
+      }
+    });
   }
 
   toggleStage(stage: string): void {
     this.selectedStages.update(prev =>
       prev.includes(stage) ? prev.filter(s => s !== stage) : [...prev, stage]
     );
+  }
+
+  selectAll(): void {
+    this.selectedStages.set([...ALL_STAGES]);
+  }
+
+  deselectAll(): void {
+    this.selectedStages.set([]);
   }
 
   copyScript(): void {
@@ -480,6 +631,10 @@ export class StrategyBuilderComponent {
     this.orgType.set('');
     this.designSystem.set('');
     this.selectedStages.set([]);
+    this.stageSearch.set('');
     this.stagesInitialized = false;
+    this.aiInsights.set('');
+    this.aiInsightsLoading.set(false);
+    this.aiInsightsError.set(false);
   }
 }

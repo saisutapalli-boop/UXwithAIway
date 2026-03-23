@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { HeroSectionComponent } from './sections/hero-section.component';
 import { FeaturesSectionComponent } from './sections/features-section.component';
 import { ImpactMetricsSectionComponent } from './sections/impact-metrics-section.component';
-import { WikiPreviewSectionComponent } from './sections/wiki-preview-section.component';
 import { CtaSectionComponent } from './sections/cta-section.component';
 
 @Component({
@@ -12,7 +11,6 @@ import { CtaSectionComponent } from './sections/cta-section.component';
     HeroSectionComponent,
     FeaturesSectionComponent,
     ImpactMetricsSectionComponent,
-    WikiPreviewSectionComponent,
     CtaSectionComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

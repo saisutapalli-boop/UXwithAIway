@@ -11,7 +11,7 @@ import { ContentService } from '../../../core/services/content.service';
     <section class="section-padding wiki-preview-section">
       <div class="container wiki-preview-content">
         <span class="section-label">Knowledge Wiki</span>
-        <h2 class="section-title">8 Sections Covering Every UX Phase</h2>
+        <h2 class="section-title">12 Sections Covering Every UX Phase</h2>
         <p class="section-subtitle">
           Practitioner-authored, opinionated, workflow-grounded - each with AI tools, templates, and video guides.
         </p>

@@ -14,7 +14,7 @@ import { ContentService } from '../../core/services/content.service';
         <span class="section-label">Knowledge Wiki</span>
         <h1 class="section-title">Practitioner-Authored UX + AI Guides</h1>
         <p class="section-subtitle">
-          Opinionated, workflow-grounded content - each section with AI tools, templates, and honest assessments.
+          Opinionated, workflow-grounded content, each section with AI tools, templates, and honest assessments.
         </p>
 
       </div>
@@ -30,7 +30,7 @@ import { ContentService } from '../../core/services/content.service';
                 <div class="wiki-card-top">
                   <div class="wiki-card-meta">
                     <span class="wiki-icon">{{ s.icon }}</span>
-                    <span class="wiki-badge" [style.color]="s.color" [style.background]="s.color + '15'">
+                    <span class="wiki-badge" [style.color]="s.color" [style.background]="s.color + '22'" [style.border]="'1px solid ' + s.color + '55'">
                       Section {{ s.id }}
                     </span>
                   </div>
@@ -110,6 +110,7 @@ import { ContentService } from '../../core/services/content.service';
       font-weight: 700;
       padding: 4px 12px;
       border-radius: var(--radius-full);
+      /* border is applied inline via [style.border] for per-color theming */
     }
 
     .wiki-arrow {
@@ -147,18 +148,39 @@ import { ContentService } from '../../core/services/content.service';
     }
 
     .skill-badge.junior {
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(16, 185, 129, 0.12);
       color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.25);
     }
 
     .skill-badge.mid {
-      background: rgba(59, 130, 246, 0.1);
+      background: rgba(59, 130, 246, 0.12);
       color: var(--info);
+      border: 1px solid rgba(59, 130, 246, 0.25);
     }
 
     .skill-badge.senior {
-      background: rgba(139, 92, 246, 0.1);
-      color: var(--accent-secondary);
+      background: rgba(139, 92, 246, 0.12);
+      color: #7c3aed;
+      border: 1px solid rgba(139, 92, 246, 0.28);
+    }
+
+    :host-context([data-theme="dark"]) .skill-badge.junior {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    :host-context([data-theme="dark"]) .skill-badge.mid {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    :host-context([data-theme="dark"]) .skill-badge.senior {
+      background: rgba(139, 92, 246, 0.18);
+      color: #c4b5fd;
+      border-color: rgba(139, 92, 246, 0.35);
     }
 
     .empty-state {

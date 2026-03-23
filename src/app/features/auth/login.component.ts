@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -12,16 +13,35 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="container">
         <div class="login-card card">
           <div class="login-header">
-            <div class="logo-icon">UX</div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" class="logo-icon" aria-hidden="true">
+              <rect width="40" height="40" rx="9" fill="#b1000e"/>
+              <path d="M9 9 L9 22 Q9 32 20 32 Q31 32 31 22 L31 9" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="14.5" y1="18.5" x2="25.5" y2="18.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="14.5" y1="18.5" x2="20" y2="26.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="25.5" y1="18.5" x2="20" y2="26.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="14.5" cy="18.5" r="2.3" fill="white"/>
+              <circle cx="25.5" cy="18.5" r="2.3" fill="white"/>
+              <circle cx="20" cy="26.5" r="2.3" fill="white"/>
+            </svg>
             <h1>Sign in to <span class="logo-text">UXwithAIway</span></h1>
             <p>Access your personalized UX workflow strategies</p>
           </div>
+
+          @if (!isFirebaseConfigured) {
+            <div class="config-notice">
+              <span class="config-notice-icon">🔧</span>
+              <div>
+                <strong>Sign-in coming soon</strong>
+                <p>Authentication is being set up. Please check back shortly.</p>
+              </div>
+            </div>
+          }
 
           @if (error()) {
             <div class="error-message">{{ error() }}</div>
           }
 
-          <div class="social-buttons">
+          <div class="social-buttons" [class.disabled-section]="!isFirebaseConfigured">
             <button class="social-btn google" (click)="signInWithGoogle()" [disabled]="loading()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -79,18 +99,12 @@ import { AuthService } from '../../core/services/auth.service';
       margin-bottom: 32px;
 
       .logo-icon {
+        display: block;
         width: 56px;
         height: 56px;
-        border-radius: 14px;
-        background: var(--accent-gradient);
-        color: #fff;
-        font-weight: 800;
-        font-size: 1.2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         margin: 0 auto 16px;
-        font-family: var(--font-heading);
+        border-radius: 12px;
+        overflow: hidden;
       }
 
       h1 {
@@ -100,7 +114,7 @@ import { AuthService } from '../../core/services/auth.service';
         color: var(--text-primary);
         
         .logo-text {
-          background: linear-gradient(135deg, #FF41F8, #7702FF, #FF8008);
+          background: linear-gradient(135deg, #b1000e 0%, #d4182a 50%, #32373c 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -196,12 +210,48 @@ import { AuthService } from '../../core/services/auth.service';
       color: var(--text-tertiary);
       margin: 0;
     }
+
+    .config-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+
+      .config-notice-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      strong {
+        display: block;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+      }
+
+      p {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.83rem;
+      }
+    }
+
+    .disabled-section {
+      opacity: 0.45;
+      pointer-events: none;
+    }
   `],
 })
 export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
+  readonly isFirebaseConfigured = !environment.firebase.apiKey.startsWith('YOUR_');
   readonly error = signal('');
   readonly loading = signal(false);
 
@@ -224,10 +274,32 @@ export class LoginComponent {
       await providerFn();
       this.router.navigate(['/']);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Sign in failed. Please try again.';
-      this.error.set(msg);
+      this.error.set(this.friendlyError(e));
     } finally {
       this.loading.set(false);
     }
+  }
+
+  private friendlyError(e: unknown): string {
+    const raw = e instanceof Error ? e.message : String(e);
+    if (raw.includes('api-key-not-valid') || raw.includes('invalid-api-key')) {
+      return 'Authentication is not configured yet. Please check back soon.';
+    }
+    if (raw.includes('popup-closed-by-user') || raw.includes('cancelled-popup-request')) {
+      return 'Sign in was cancelled. Please try again.';
+    }
+    if (raw.includes('popup-blocked')) {
+      return 'Pop-up was blocked by your browser. Please allow pop-ups for this site and try again.';
+    }
+    if (raw.includes('network-request-failed')) {
+      return 'Network error. Please check your connection and try again.';
+    }
+    if (raw.includes('too-many-requests')) {
+      return 'Too many sign-in attempts. Please wait a moment and try again.';
+    }
+    if (raw.includes('account-exists-with-different-credential')) {
+      return 'An account already exists with this email using a different sign-in method.';
+    }
+    return 'Sign in failed. Please try again.';
   }
 }

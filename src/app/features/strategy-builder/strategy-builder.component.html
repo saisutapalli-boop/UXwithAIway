@@ -9,7 +9,7 @@
   </div>
 </section>
 
-<!-- Progress Bar (3 steps only; step 4 = output page shown with all steps completed) -->
+<!-- Progress Bar (3 steps; all show ✓ completed when on the output view) -->
 <div class="sb-progress">
   <div class="container progress-track">
     @for (label of stepLabels; track label; let i = $index) {
@@ -31,17 +31,6 @@
         }
       </div>
     }
-    <!-- Output page indicator -->
-    <div class="progress-step">
-      <div class="step-circle" [class.active]="step() === 4" [class.completed]="step() > 4">
-        @if (step() === 4) {
-          <span>&#9654;</span>
-        } @else {
-          <span>4</span>
-        }
-      </div>
-      <span class="step-label preview-label" [class.active]="step() === 4">Preview</span>
-    </div>
   </div>
 </div>
 
@@ -54,7 +43,7 @@
       <div class="guest-banner">
         <span class="guest-banner-text">
           <span class="guest-banner-icon">&#9888;</span>
-          Not signed in — your strategy will be lost if you refresh or navigate away.
+          Not signed in. Your strategy will be lost if you refresh or navigate away.
         </span>
         <a routerLink="/auth/login" class="guest-banner-sign-in">Sign in to save &rarr;</a>
       </div>
@@ -145,11 +134,31 @@
       <div class="animate-fade-in">
         <h2 class="step-title">Step 3: Stage Selection</h2>
         <p class="step-desc">
-          Recommended stages are pre-selected. Toggle stages on/off. Deselecting a recommended stage may affect quality.
+          Recommended stages are pre-selected based on your project context. Toggle stages on/off, or use the controls below.
         </p>
 
+        <!-- Search + controls bar -->
+        <div class="stage-controls">
+          <input
+            type="text"
+            class="stage-search-input"
+            [value]="stageSearch()"
+            (input)="stageSearch.set($any($event.target).value)"
+            placeholder="Search stages…"
+          />
+          <div class="stage-select-btns">
+            <button class="stage-select-btn" (click)="selectAll()">
+              &#10003; Select All
+            </button>
+            <button class="stage-select-btn" (click)="deselectAll()">
+              &#10005; Deselect All
+            </button>
+            <span class="stage-count-badge">{{ selectedStages().length }} / {{ allStages.length }} selected</span>
+          </div>
+        </div>
+
         <div class="stage-grid">
-          @for (stage of allStages; track stage) {
+          @for (stage of filteredStages(); track stage) {
             <button
               class="stage-card"
               [class.selected]="selectedStages().includes(stage)"
@@ -173,6 +182,11 @@
                 <span class="stage-warning">Removing may reduce quality</span>
               }
             </button>
+          }
+          @if (filteredStages().length === 0) {
+            <div class="stage-empty">
+              No stages match &ldquo;{{ stageSearch() }}&rdquo;.
+            </div>
           }
         </div>
 
@@ -299,6 +313,65 @@
           </div>
         }
 
+        <!-- AI Strategy Insights (Gemini) -->
+        <div class="card output-card ai-insights-card">
+          <div class="ai-insights-header">
+            <div class="ai-insights-title-row">
+              <span class="ai-insights-badge">✦ Gemini AI</span>
+              <h3 class="card-title">AI Strategy Insights</h3>
+            </div>
+            @if (!aiInsightsLoading() && !aiInsightsError() && aiInsights()) {
+              <button class="ai-refresh-btn" (click)="generateAIInsights()" title="Regenerate insights">&#8635; Refresh</button>
+            }
+          </div>
+          @if (aiInsightsLoading()) {
+            <div class="ai-loading">
+              <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+              <p class="ai-loading-text">Generating personalised insights for your project...</p>
+            </div>
+          } @else if (aiInsightsError()) {
+            <div class="ai-error">
+              <p>Unable to generate AI insights at this time.</p>
+              <button class="ai-retry-btn" (click)="generateAIInsights()">Try Again</button>
+            </div>
+          } @else if (aiInsights()) {
+            <div class="ai-insights-content">
+              @for (line of aiInsights().split('\n'); track $index) {
+                @if (line.trim()) {
+                  <p class="ai-insight-line">{{ line.trim() }}</p>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Action Plan -->
+        <div class="card output-card">
+          <h3 class="card-title">Action Plan</h3>
+          <div class="action-plan-grid">
+            <div class="action-col">
+              <div class="action-col-header action-now">Today</div>
+              @for (item of actionPlan().now; track item) {
+                <div class="action-item">{{ item }}</div>
+              }
+            </div>
+            <div class="action-col">
+              <div class="action-col-header action-week">Week 1</div>
+              @for (item of actionPlan().week1; track item) {
+                <div class="action-item">{{ item }}</div>
+              }
+            </div>
+            @if (actionPlan().month1.length > 0) {
+              <div class="action-col">
+                <div class="action-col-header action-month">Month 1</div>
+                @for (item of actionPlan().month1; track item) {
+                  <div class="action-item">{{ item }}</div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
         <!-- Reading Path -->
         <div class="card output-card">
           <h3 class="card-title">Reading Path</h3>
@@ -320,7 +393,7 @@
             <div>
               <h3 class="card-title">Export to Google Slides</h3>
               <p class="slides-export-desc">
-                Generate a full strategy presentation — problem framing, workflow, tool stack, constraints, and a 3-phase action plan — ready to open in Google Slides.
+                Generate a full strategy presentation, including problem framing, workflow, tool stack, constraints, and a 3-phase action plan, which will be ready to open in Google Slides.
               </p>
             </div>
             <div class="slides-badge">
@@ -328,32 +401,43 @@
             </div>
           </div>
 
-          <!-- Slide preview toggle -->
-          <button class="slides-preview-toggle" (click)="showSlidePreview.set(!showSlidePreview())">
-            {{ showSlidePreview() ? '&#9650; Hide Preview' : '&#9660; Preview Slides' }}
-          </button>
+          <!-- Slide preview: open button shown only when closed -->
+          @if (!showSlidePreview()) {
+            <button class="slides-preview-toggle" (click)="showSlidePreview.set(true)">
+              &#9660; Preview Slides
+            </button>
+          }
 
+          <!-- Slide preview panel: stopPropagation prevents scroll-click from closing it -->
           @if (showSlidePreview()) {
-            <div class="slides-preview-grid">
-              @for (slide of slides(); track slide.title; let i = $index) {
-                <div class="slide-thumb">
-                  <div class="slide-thumb-num">{{ i + 1 }}</div>
-                  <div class="slide-thumb-title">{{ slide.title }}</div>
-                  @if (slide.subtitle) {
-                    <div class="slide-thumb-sub">{{ slide.subtitle }}</div>
-                  }
-                  @if (slide.bullets.length > 0) {
-                    <ul class="slide-thumb-bullets">
-                      @for (b of slide.bullets.slice(0, 3); track b) {
-                        <li>{{ b }}</li>
-                      }
-                      @if (slide.bullets.length > 3) {
-                        <li class="slide-thumb-more">+{{ slide.bullets.length - 3 }} more</li>
-                      }
-                    </ul>
-                  }
-                </div>
-              }
+            <div class="slides-preview-panel" (click)="$event.stopPropagation()">
+              <div class="slides-preview-panel-header">
+                <span class="slides-preview-panel-label">Slide Preview: {{ slides().length }} slides</span>
+                <button class="slides-preview-close" (click)="showSlidePreview.set(false)">
+                  &#10005; Close Preview
+                </button>
+              </div>
+              <div class="slides-preview-grid">
+                @for (slide of slides(); track slide.title; let i = $index) {
+                  <div class="slide-thumb">
+                    <div class="slide-thumb-num">{{ i + 1 }}</div>
+                    <div class="slide-thumb-title">{{ slide.title }}</div>
+                    @if (slide.subtitle) {
+                      <div class="slide-thumb-sub">{{ slide.subtitle }}</div>
+                    }
+                    @if (slide.bullets.length > 0) {
+                      <ul class="slide-thumb-bullets">
+                        @for (b of slide.bullets.slice(0, 3); track b) {
+                          <li>{{ b }}</li>
+                        }
+                        @if (slide.bullets.length > 3) {
+                          <li class="slide-thumb-more">+{{ slide.bullets.length - 3 }} more</li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           }
 
@@ -361,7 +445,7 @@
           <div class="slides-steps">
             <div class="slides-step"><span class="slides-step-num">1</span>Copy the Apps Script below</div>
             <div class="slides-step"><span class="slides-step-num">2</span>Open <strong>script.google.com</strong> → New project</div>
-            <div class="slides-step"><span class="slides-step-num">3</span>Paste &amp; click ▶ Run — a Google Slides deck is created</div>
+            <div class="slides-step"><span class="slides-step-num">3</span>Paste and click ▶ Run to create a Google Slides deck</div>
           </div>
 
           <button class="btn-slides" (click)="copyScript()">
