@@ -113,6 +113,14 @@ a:hover {
 }
 
 /* ========== UTILITY CLASSES ========== */
+.text-center {
+  text-align: center;
+}
+
+.centered {
+  margin: 0 auto;
+}
+
 .glass {
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
@@ -258,6 +266,77 @@ a:hover {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+/* ========== FORM ELEMENTS ========== */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group-lg {
+  margin-bottom: 32px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  resize: vertical;
+  font-family: var(--font-sans);
+  transition: border-color 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: var(--accent-primary);
+  }
+}
+
+.option-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.option-btn {
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.sm {
+    padding: 10px 18px;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  &.selected {
+    border-color: var(--accent-primary);
+    background: var(--accent-primary);
+    color: #fff;
+  }
+
+  &:hover:not(.selected) {
+    border-color: var(--accent-primary);
+  }
 }
 
 /* ========== RESPONSIVE ========== */
