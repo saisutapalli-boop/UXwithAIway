@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Angular Dev Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "port": 4200
+    },
+    {
+      "name": "Angular Watch Build",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "watch"],
+      "port": 4200
+    }
+  ]
+}
