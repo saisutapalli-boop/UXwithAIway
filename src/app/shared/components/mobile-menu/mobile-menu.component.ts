@@ -4,9 +4,11 @@ import {
   Input,
   Output,
   EventEmitter,
+  inject,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-mobile-menu',
@@ -46,17 +48,42 @@ import { LucideAngularModule } from 'lucide-angular';
             >{{ link.label }}</a>
           }
         </div>
+        <div class="menu-auth">
+          @if (authService.user(); as user) {
+            <div class="auth-user">
+              <div class="auth-user-info">
+                @if (user.photoURL) {
+                  <img [src]="user.photoURL" [alt]="user.displayName || 'User'" class="auth-avatar-img" />
+                } @else {
+                  <span class="auth-avatar-letter">{{ (user.displayName || user.email || 'U')!.charAt(0).toUpperCase() }}</span>
+                }
+                <span class="auth-user-name">{{ user.displayName || user.email }}</span>
+              </div>
+              <a routerLink="/auth/profile" class="menu-link" (click)="close()">Profile</a>
+              <button class="menu-link sign-out-btn" (click)="onSignOut()">Sign Out</button>
+            </div>
+          } @else {
+            <a routerLink="/auth/login" class="sign-in-btn" (click)="close()">Sign In</a>
+          }
+        </div>
       </nav>
     }
   `,
   styleUrl: './mobile-menu.component.scss',
 })
 export class MobileMenuComponent {
+  readonly authService = inject(AuthService);
+
   @Input() isOpen = false;
   @Input() links: { href: string; label: string }[] = [];
   @Output() closed = new EventEmitter<void>();
 
   close(): void {
     this.closed.emit();
+  }
+
+  onSignOut(): void {
+    this.authService.logout();
+    this.close();
   }
 }
