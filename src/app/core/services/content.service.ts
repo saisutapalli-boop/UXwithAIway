@@ -15,6 +15,7 @@ export class ContentService {
     { id: '06', slug: 'design-prototyping', title: 'Design & Prototyping', description: 'Scale-calibrated AI design tools - from solo v0 scaffolding to enterprise-level design system governance.', icon: '\uD83C\uDFA8', skillLevels: ['mid', 'senior'], color: '#10b981' },
     { id: '07', slug: 'usability-testing', title: 'Usability Testing & A/B', description: 'Unmoderated testing with AI summaries, predictive heatmaps, and A/B hypothesis generation from design variants.', icon: '\uD83E\uDDEA', skillLevels: ['mid', 'senior'], color: '#3b82f6' },
     { id: '08', slug: 'heuristic-evaluation', title: 'Heuristic Evaluation & UX Audit', description: 'AI-accelerated audit delivery - from 3 days to 6 hours. Custom checklists, severity-rated findings, executive summaries.', icon: '\uD83D\uDCCB', skillLevels: ['senior'], color: '#ef4444' },
+    { id: '09', slug: 'how-to-use-llms-for-free', title: 'How to Use LLMs for Free', description: 'Comprehensive guide to accessing powerful LLMs without subscription costs. Open-source alternatives and free tiers.', icon: '\uD83D\uDCA1', skillLevels: ['junior', 'mid', 'senior'], color: '#10b981' },
   ];
 
   private readonly tools: Tool[] = [
@@ -103,9 +104,11 @@ export class ContentService {
       ],
       constraints: ['This is foundational content - no project-specific constraints apply. Suitable for all project types and contract structures.'],
       videos: [
-        { title: 'Intro to Large Language Models', url: 'https://www.youtube-nocookie.com/embed/zjkBMFhNj_g' },
-        { title: 'How AI Works - Explained for Designers', url: 'https://www.youtube-nocookie.com/embed/wCvtTQ-CTgU' },
-        { title: 'AI for UX Designers - Crash Course', url: 'https://www.youtube-nocookie.com/embed/sFq7F9gW23k' },
+        { title: 'Intro to Large Language Models', url: 'https://www.youtube.com/embed/zjkBMFhNj_g' },
+        { title: 'How AI Works - Explained for Designers', url: 'https://www.youtube.com/embed/wCvtTQ-CTgU' },
+        { title: 'AI for UX Designers - Crash Course', url: 'https://www.youtube.com/embed/sFq7F9gW23k' },
+        { title: 'Google Stitch + Claude Code = Insane App Design', url: 'https://www.youtube.com/embed/sZQ7lqaOGMg' },
+        { title: 'How to Start Any Design Project in 2026', url: 'https://www.youtube.com/embed/Re2xf0tSbXk' },
       ],
     },
     'ai-ux-for-strategy': {
@@ -124,9 +127,10 @@ export class ContentService {
       ],
       constraints: ['Fixed Bid: Focus on rapid competitive analysis. Keep strategy phase under 2 days.', 'Consultancy: Strategy outputs should be client-presentable. Use Perplexity for source-backed findings.'],
       videos: [
-        { title: 'AI Tools for UX Designers - 2026 Workflow', url: 'https://www.youtube-nocookie.com/embed/3dBbQhPLHVQ' },
-        { title: 'Turning a Product Brief into UI with AI', url: 'https://www.youtube-nocookie.com/embed/V6K-xHB3zGk' },
-        { title: 'The New UX Tech Stack: How to Strategically Use AI', url: 'https://www.youtube-nocookie.com/embed/rNTM-GcPAZ0' },
+        { title: 'AI Tools for UX Designers - 2026 Workflow', url: 'https://www.youtube.com/embed/3dBbQhPLHVQ' },
+        { title: 'Turning a Product Brief into UI with AI', url: 'https://www.youtube.com/embed/V6K-xHB3zGk' },
+        { title: 'The New UX Tech Stack: How to Strategically Use AI', url: 'https://www.youtube.com/embed/rNTM-GcPAZ0' },
+        { title: 'How to Build a Full Stack App with AI in 2026', url: 'https://www.youtube.com/embed/pRUJfTXdVfU' },
       ],
     },
     'primary-research': {
@@ -146,9 +150,10 @@ export class ContentService {
       ],
       constraints: ['Fixed Bid: Max 5 interviews. Use Loom for async sessions. AI synthesis compresses analysis from days to hours.', 'Consultancy: Verify client data handling rules before using Dovetail with real user data.'],
       videos: [
-        { title: 'How Our UX Studio Uses AI for Research', url: 'https://www.youtube-nocookie.com/embed/yhHJRPDEhb4' },
-        { title: 'How to Use AI to Increase Efficiency in User Research', url: 'https://www.youtube-nocookie.com/embed/pPgPFqrXMiw' },
-        { title: 'Top 7 AI Tools For UX Research', url: 'https://www.youtube-nocookie.com/embed/Ns6mhkFV5yQ' },
+        { title: 'How Our UX Studio Uses AI for Research', url: 'https://www.youtube.com/embed/yhHJRPDEhb4' },
+        { title: 'How to Use AI to Increase Efficiency in User Research', url: 'https://www.youtube.com/embed/pPgPFqrXMiw' },
+        { title: 'Top 7 AI Tools For UX Research', url: 'https://www.youtube.com/embed/Ns6mhkFV5yQ' },
+        { title: 'Antigravity + Flutter: AI-Powered Research & Design', url: 'https://www.youtube.com/embed/bhPHwVsrTo0' },
       ],
     },
     'secondary-research': {
@@ -167,9 +172,9 @@ export class ContentService {
       ],
       constraints: ['All public data - no client data risk. All tools usable without client approval.'],
       videos: [
-        { title: 'How to Use AI for Quick Competitive Analysis', url: 'https://www.youtube-nocookie.com/embed/63TfbSiSEzY' },
-        { title: 'AI For Data Analysis - Perplexity, Claude & ChatGPT', url: 'https://www.youtube-nocookie.com/embed/KMnx5LBzh-g' },
-        { title: 'AI in UX Research - Make Research Faster and Smarter', url: 'https://www.youtube-nocookie.com/embed/sRBe1gzuFEg' },
+        { title: 'How to Use AI for Quick Competitive Analysis', url: 'https://www.youtube.com/embed/63TfbSiSEzY' },
+        { title: 'AI For Data Analysis - Perplexity, Claude & ChatGPT', url: 'https://www.youtube.com/embed/KMnx5LBzh-g' },
+        { title: 'AI in UX Research - Make Research Faster and Smarter', url: 'https://www.youtube.com/embed/sRBe1gzuFEg' },
       ],
     },
     'ideation-brainstorming': {
@@ -187,9 +192,9 @@ export class ContentService {
       ],
       constraints: ['AI ideation must follow, not replace, human creative sessions.', 'Monitor for premature convergence - AI tends toward safe, averaged solutions.'],
       videos: [
-        { title: 'Brainstorm and Ideate with Generative AI - Adobe', url: 'https://www.youtube-nocookie.com/embed/vLQS24xc1WY' },
-        { title: 'How to Use AI to Generate and Develop Ideas', url: 'https://www.youtube-nocookie.com/embed/7xTGNjDFbEU' },
-        { title: 'Learn AI for Brainstorming - Google AI Certificate', url: 'https://www.youtube-nocookie.com/embed/I02_9V-xRLM' },
+        { title: 'Brainstorm and Ideate with Generative AI - Adobe', url: 'https://www.youtube.com/embed/vLQS24xc1WY' },
+        { title: 'How to Use AI to Generate and Develop Ideas', url: 'https://www.youtube.com/embed/7xTGNjDFbEU' },
+        { title: 'Learn AI for Brainstorming - Google AI Certificate', url: 'https://www.youtube.com/embed/I02_9V-xRLM' },
       ],
     },
     'design-prototyping': {
@@ -208,9 +213,12 @@ export class ContentService {
       ],
       constraints: ['Governance before design at enterprise scale.', 'No new components without AI-assisted audit of existing coverage.'],
       videos: [
-        { title: 'ChatGPT for UX Designers - Fast Prototyping Workflow', url: 'https://www.youtube-nocookie.com/embed/P3R3fuHXCCA' },
-        { title: 'AI Design Workflow - From Concept to Deployed App', url: 'https://www.youtube-nocookie.com/embed/GBl3H7bSwkE' },
-        { title: 'Intro to AI for UX Design - Google Certificate', url: 'https://www.youtube-nocookie.com/embed/iFkBIJNUt7k' },
+        { title: 'ChatGPT for UX Designers - Fast Prototyping Workflow', url: 'https://www.youtube.com/embed/P3R3fuHXCCA' },
+        { title: 'AI Design Workflow - From Concept to Deployed App', url: 'https://www.youtube.com/embed/GBl3H7bSwkE' },
+        { title: 'Intro to AI for UX Design - Google Certificate', url: 'https://www.youtube.com/embed/iFkBIJNUt7k' },
+        { title: 'AntiGravity + Figma: Insane Mobile App Design', url: 'https://www.youtube.com/embed/n3o8MgaNRE4' },
+        { title: 'How I’d Learn UI/UX Design In 2026 with AI', url: 'https://www.youtube.com/embed/2OlT0n6JlUg' },
+        { title: 'Figma AI Features - Complete 2026 Guide', url: 'https://www.youtube.com/embed/s3unZGKIkWc' },
       ],
     },
     'usability-testing': {
@@ -229,9 +237,9 @@ export class ContentService {
       ],
       constraints: ['AI summaries supplement, not replace, human interpretation of qualitative behavior.', 'Ensure sample sizes are statistically significant for A/B testing.'],
       videos: [
-        { title: 'Optimize Designs with AI Attention Heatmaps', url: 'https://www.youtube-nocookie.com/embed/zRCiMb-LVBY' },
-        { title: 'Best AI Usability Testing Tools in 2024', url: 'https://www.youtube-nocookie.com/embed/LfSqlnqFcuQ' },
-        { title: 'Usability Testing for AI Systems - Exclusive Lesson', url: 'https://www.youtube-nocookie.com/embed/2HLVLP_Htv4' },
+        { title: 'Optimize Designs with AI Attention Heatmaps', url: 'https://www.youtube.com/embed/zRCiMb-LVBY' },
+        { title: 'Best AI Usability Testing Tools in 2024', url: 'https://www.youtube.com/embed/LfSqlnqFcuQ' },
+        { title: 'Usability Testing for AI Systems - Exclusive Lesson', url: 'https://www.youtube.com/embed/2HLVLP_Htv4' },
       ],
     },
     'heuristic-evaluation': {
@@ -249,9 +257,29 @@ export class ContentService {
       ],
       constraints: ['Consultant impact: 3-day audit \u2192 6 hours. Directly improves fixed-bid economics.', 'Deliverable: UX Audit Report Template - severity matrix, findings structure, executive summary, recommendation grid.'],
       videos: [
-        { title: 'How to Do a UX/CRO Audit Step by Step with AI', url: 'https://www.youtube-nocookie.com/embed/SJKJ_BmtvN8' },
-        { title: 'Heuristic Evaluation - Nielsen Norman Group', url: 'https://www.youtube-nocookie.com/embed/6Bw0n6Jvwxk' },
-        { title: 'How to Conduct a Heuristic Evaluation', url: 'https://www.youtube-nocookie.com/embed/0YL0xoSmyZI' },
+        { title: 'How to Do a UX/CRO Audit Step by Step with AI', url: 'https://www.youtube.com/embed/SJKJ_BmtvN8' },
+        { title: 'Heuristic Evaluation - Nielsen Norman Group', url: 'https://www.youtube.com/embed/6Bw0n6Jvwxk' },
+        { title: 'How to Conduct a Heuristic Evaluation', url: 'https://www.youtube.com/embed/0YL0xoSmyZI' },
+      ],
+    },
+    'how-to-use-llms-for-free': {
+      overview: 'Powerful LLMs like Claude, GPT-4, and Llama 3 are accessible without subscription costs if you know where to look. This section curates the best methods for using top-shelf AI for free.',
+      workflow: [
+        { step: 'Official Free Tiers', tool: 'Claude / ChatGPT', desc: 'Leverage the generous free tiers of industry leaders with daily limits.' },
+        { step: 'Open Source Hosting', tool: 'Groq / Hugging Face', desc: 'Use Llama 3 and other open-source models at incredible speeds for free.' },
+        { step: 'Local Execution', tool: 'Ollama', desc: 'Run models completely locally on your hardware for 100% privacy and no cost.' },
+      ],
+      tools: [
+        { name: 'Claude.ai', use: 'Daily free messages of Sonnet 3.5', freeTier: 'Free tier available', clientSafe: true },
+        { name: 'ChatGPT', use: 'Free access to GPT-4o mini', freeTier: 'Free tier available', clientSafe: true },
+        { name: 'Groq', use: 'Fastest Llama 3 hosting', freeTier: 'Free public access', clientSafe: true },
+      ],
+      constraints: ['Usage limits on official tiers apply.', 'Local execution requires compatible hardware (Apple Silicon or GPU).'],
+      videos: [
+        { title: 'How To Use Claude Code FREE Forever (Ollama Setup)', url: 'https://www.youtube.com/embed/gqYyZuO34x0' },
+      ],
+      resources: [
+        { title: 'X: Expert tips on Free LLM Access', url: 'https://x.com/Ubermenscchh/status/2035390128819167502' },
       ],
     },
   };

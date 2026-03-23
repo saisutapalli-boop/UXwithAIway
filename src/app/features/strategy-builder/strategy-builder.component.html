@@ -9,7 +9,7 @@
   </div>
 </section>
 
-<!-- Progress Bar -->
+<!-- Progress Bar (3 steps only; step 4 = output page shown with all steps completed) -->
 <div class="sb-progress">
   <div class="container progress-track">
     @for (label of stepLabels; track label; let i = $index) {
@@ -26,17 +26,39 @@
           }
         </div>
         <span class="step-label" [class.active]="step() === i + 1">{{ label }}</span>
-        @if (i < 3) {
+        @if (i < 2) {
           <div class="step-connector" [class.completed]="step() > i + 1"></div>
         }
       </div>
     }
+    <!-- Output page indicator -->
+    <div class="progress-step">
+      <div class="step-circle" [class.active]="step() === 4" [class.completed]="step() > 4">
+        @if (step() === 4) {
+          <span>&#9654;</span>
+        } @else {
+          <span>4</span>
+        }
+      </div>
+      <span class="step-label preview-label" [class.active]="step() === 4">Preview</span>
+    </div>
   </div>
 </div>
 
 <!-- Steps Content -->
 <section class="section-padding sb-content">
   <div class="container sb-container">
+
+    <!-- Guest warning banner (shown on all steps when not signed in) -->
+    @if (!isLoggedIn()) {
+      <div class="guest-banner">
+        <span class="guest-banner-text">
+          <span class="guest-banner-icon">&#9888;</span>
+          Not signed in — your strategy will be lost if you refresh or navigate away.
+        </span>
+        <a routerLink="/auth/login" class="guest-banner-sign-in">Sign in to save &rarr;</a>
+      </div>
+    }
 
     <!-- Step 1: Problem Framing -->
     @if (step() === 1) {
@@ -163,9 +185,43 @@
       </div>
     }
 
-    <!-- Step 4: Strategy Output -->
+    <!-- Step 4: Strategy Output (Full Preview Page) -->
     @if (step() === 4) {
       <div class="animate-fade-in">
+
+        <!-- Personalised heading (signed-in) -->
+        @if (isLoggedIn() && currentUser()) {
+          <div class="strategy-owner">
+            @if (currentUser()!.photoURL) {
+              <img
+                [src]="currentUser()!.photoURL!"
+                [alt]="currentUser()!.displayName || 'User'"
+                class="strategy-owner-avatar"
+              />
+            } @else {
+              <div class="strategy-owner-avatar-placeholder">
+                {{ (currentUser()!.displayName || currentUser()!.email || 'U').charAt(0).toUpperCase() }}
+              </div>
+            }
+            <div>
+              <div class="strategy-owner-label">Strategy built for</div>
+              <div class="strategy-owner-name">{{ currentUser()!.displayName || currentUser()!.email }}</div>
+            </div>
+          </div>
+        }
+
+        <!-- Guest save warning (on output page) -->
+        @if (!isLoggedIn()) {
+          <div class="guest-save-banner">
+            <span class="guest-save-icon">&#9888;</span>
+            <div class="guest-save-body">
+              <strong>Your strategy is not saved.</strong>
+              Navigating away or refreshing this page will permanently lose your work.
+            </div>
+            <a routerLink="/auth/login" class="btn-primary guest-save-btn">Sign in to save</a>
+          </div>
+        }
+
         <h2 class="step-title">Your AI Strategy</h2>
 
         <!-- Project Summary -->
@@ -326,8 +382,8 @@
 
         <!-- Actions -->
         <div class="btn-row">
-          <button class="btn-secondary" (click)="goToStep(1)">Start Over</button>
-          <button class="btn-secondary" (click)="resetAll()">Reset All</button>
+          <button class="btn-secondary" (click)="goToStep(3)">&larr; Edit Stages</button>
+          <button class="btn-secondary" (click)="resetAll()">Start Over</button>
         </div>
       </div>
     }

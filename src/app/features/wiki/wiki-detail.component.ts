@@ -130,6 +130,26 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
               </div>
             </div>
 
+            <!-- Resources -->
+            @if (c.resources && c.resources.length > 0) {
+              <div class="content-block">
+                <h2 class="content-heading">Related Resources</h2>
+                <div class="resources-list">
+                  @for (r of c.resources; track r.url) {
+                    <a [href]="r.url" target="_blank" rel="noopener noreferrer" class="card resource-card">
+                      <div class="resource-item">
+                        <span class="resource-icon">🔗</span>
+                        <div class="resource-info">
+                          <strong class="resource-title">{{ r.title }}</strong>
+                          <span class="resource-link">{{ r.url }}</span>
+                        </div>
+                      </div>
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+
             <!-- Template Download -->
             <div class="card template-card">
               <h3 class="template-title">Downloadable Template</h3>
@@ -428,6 +448,59 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     .video-wrapper iframe {
       border: none;
       display: block;
+    }
+
+    .resources-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .resource-card {
+      padding: 16px 20px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-color);
+    }
+
+    .resource-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .resource-icon {
+      font-size: 1.5rem;
+      background: rgba(99, 102, 241, 0.1);
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .resource-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .resource-title {
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    .resource-link {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      word-break: break-all;
     }
 
     @media (max-width: 768px) {

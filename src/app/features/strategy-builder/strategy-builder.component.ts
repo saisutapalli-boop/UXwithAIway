@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 interface ToolRec {
   name: string;
@@ -29,7 +30,7 @@ const ALL_STAGES = [
   'Measurement & Continuous Improvement',
 ];
 
-const STEP_LABELS = ['Problem Framing', 'Project Matrix', 'Stage Selection', 'Strategy Output'];
+const STEP_LABELS = ['Problem Framing', 'Project Matrix', 'Stage Selection'];
 
 function getRecommendedStages(projectType: string, timeline: string): string[] {
   if (projectType.startsWith('UX Audit')) {
@@ -321,6 +322,12 @@ function getConstraints(projectType: string, contract: string, org: string, desi
   styleUrl: './strategy-builder.component.scss',
 })
 export class StrategyBuilderComponent {
+  private authService = inject(AuthService);
+
+  // Auth state
+  readonly isLoggedIn = computed(() => this.authService.isLoggedIn());
+  readonly currentUser = computed(() => this.authService.user());
+
   // Constants exposed to template
   readonly projectTypes = PROJECT_TYPES;
   readonly contractTypes = CONTRACT_TYPES;

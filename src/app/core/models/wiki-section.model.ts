@@ -14,4 +14,5 @@ export interface WikiSectionContent {
   tools: { name: string; use: string; freeTier: string; clientSafe: boolean }[];
   constraints: string[];
   videos: { title: string; url: string }[];
+  resources?: { title: string; url: string }[];
 }
