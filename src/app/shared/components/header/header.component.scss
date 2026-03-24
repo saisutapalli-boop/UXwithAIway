@@ -129,4 +129,8 @@
   .mobile-menu-btn {
     display: flex;
   }
+
+  ::ng-deep app-auth-button {
+    display: none;
+  }
 }
