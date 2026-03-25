@@ -5,7 +5,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { SubmissionsService } from '../../core/services/submissions.service';
 
 const ALL_PHASES = ['Strategy', 'Research', 'Ideation', 'Design', 'Testing', 'Audit'];
-const ALL_CATEGORIES = ['AI Assistant', 'AI Search', 'Research', 'Design', 'Testing', 'Analytics', 'Collaboration', 'Productivity', 'Audit', 'Communication', 'Speech-to-Text'];
+const ALL_CATEGORIES = ['AI Assistant', 'AI Search', 'AI Stack Combo', 'Research', 'Design', 'Testing', 'Analytics', 'Collaboration', 'Productivity', 'Audit', 'Communication', 'Speech-to-Text'];
 
 @Component({
   selector: 'app-tools-list',
@@ -69,6 +69,16 @@ const ALL_CATEGORIES = ['AI Assistant', 'AI Search', 'Research', 'Design', 'Test
                 placeholder="e.g. Maze, Figma, Miro"
                 required
               />
+            </div>
+
+            <!-- Combo Toggle -->
+            <div class="form-group">
+              <label class="toggle-item combo-toggle">
+                <button type="button" class="toggle-btn" [class.on]="formIsCombo()" (click)="formIsCombo.set(!formIsCombo())">
+                  <span class="toggle-knob"></span>
+                </button>
+                <span class="toggle-label">This is an AI Stack Combo (multiple tools combined)</span>
+              </label>
             </div>
 
             <!-- Category -->
@@ -271,10 +281,10 @@ const ALL_CATEGORIES = ['AI Assistant', 'AI Search', 'Research', 'Design', 'Test
             <div class="tools-grid">
               @for (t of filteredTools(); track t.slug) {
                 <a [routerLink]="['/tools', t.slug]" class="tool-card-link">
-                  <div class="card tool-card">
+                  <div class="card tool-card" [class.combo-card]="t.category === 'AI Stack Combo'">
                     <div class="tool-card-top">
                       <h3 class="tool-name">{{ t.name }}</h3>
-                      <span class="tool-category">{{ t.category }}</span>
+                      <span class="tool-category" [class.combo-category]="t.category === 'AI Stack Combo'">{{ t.category }}</span>
                     </div>
 
                     <p class="tool-desc">{{ t.description }}</p>
@@ -503,6 +513,21 @@ const ALL_CATEGORIES = ['AI Assistant', 'AI Search', 'Research', 'Design', 'Test
       color: var(--text-tertiary);
       white-space: nowrap;
       flex-shrink: 0;
+    }
+
+    .combo-card {
+      border-left: 3px solid var(--accent-primary);
+    }
+
+    .combo-category {
+      background: rgba(177, 0, 14, 0.1);
+      color: var(--accent-primary);
+    }
+
+    .combo-toggle {
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-tertiary);
     }
 
     .tool-desc {
@@ -856,7 +881,7 @@ export class ToolsListComponent {
 
   // ── Filter options ──
   readonly phases     = ['All', 'Strategy', 'Research', 'Ideation', 'Design', 'Testing', 'Audit'];
-  readonly categories = ['All', 'AI Assistant', 'AI Search', 'Research', 'Design', 'Testing', 'Analytics', 'Collaboration', 'Productivity', 'Audit', 'Communication', 'Speech-to-Text'];
+  readonly categories = ['All', 'AI Assistant', 'AI Search', 'AI Stack Combo', 'Research', 'Design', 'Testing', 'Analytics', 'Collaboration', 'Productivity', 'Audit', 'Communication', 'Speech-to-Text'];
   readonly pricingFilters  = ['All', 'Free Tier', 'Paid Only'];
   readonly safeFilters     = ['All', 'Client-Safe', 'Review Required'];
   readonly approvalFilters = ['All', 'No Approval Needed', 'Approval Required'];
@@ -933,6 +958,7 @@ export class ToolsListComponent {
   readonly formFreemium   = signal(true);
   readonly formClientSafe = signal(false);
   readonly formApprovalRequired = signal(false);
+  readonly formIsCombo    = signal(false);
   readonly formError      = signal('');
 
   openForm(): void { this.showForm.set(true); }
@@ -980,6 +1006,7 @@ export class ToolsListComponent {
     this.formFreemium.set(true);
     this.formClientSafe.set(false);
     this.formApprovalRequired.set(false);
+    this.formIsCombo.set(false);
     this.formError.set('');
   }
 }
