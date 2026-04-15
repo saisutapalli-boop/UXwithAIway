@@ -477,6 +477,22 @@ export class StrategyBuilderComponent {
     getToolStack(this.selectedStages(), this.contractType(), this.orgType())
   );
 
+  // Top-5 tool preview with "view more" toggle
+  readonly showAllTools = signal(false);
+  readonly toolPreviewLimit = 5;
+  readonly visibleToolStack = computed(() => {
+    const all = this.toolStack();
+    return this.showAllTools() ? all : all.slice(0, this.toolPreviewLimit);
+  });
+  readonly hasMoreTools = computed(() => this.toolStack().length > this.toolPreviewLimit);
+  readonly hiddenToolCount = computed(() =>
+    Math.max(0, this.toolStack().length - this.toolPreviewLimit)
+  );
+
+  toggleShowAllTools(): void {
+    this.showAllTools.update(v => !v);
+  }
+
   readonly constraints = computed(() =>
     getConstraints(this.projectType(), this.contractType(), this.orgType(), this.designSystem())
   );
@@ -636,5 +652,6 @@ Provide 3-4 actionable insights as a plain text list. Each insight should start 
     this.aiInsights.set('');
     this.aiInsightsLoading.set(false);
     this.aiInsightsError.set(false);
+    this.showAllTools.set(false);
   }
 }

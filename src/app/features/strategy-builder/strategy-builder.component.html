@@ -264,7 +264,14 @@
 
         <!-- AI Tool Stack -->
         <div class="card output-card">
-          <h3 class="card-title">AI Tool Stack</h3>
+          <div class="tool-stack-header">
+            <h3 class="card-title">AI Tool Stack</h3>
+            @if (toolStack().length > 0) {
+              <span class="tool-count">
+                Showing {{ visibleToolStack().length }} of {{ toolStack().length }}
+              </span>
+            }
+          </div>
           <div class="table-wrap">
             <table class="tool-table">
               <thead>
@@ -277,7 +284,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (t of toolStack(); track t.name + t.phase) {
+                @for (t of visibleToolStack(); track t.name + t.phase) {
                   <tr>
                     <td class="tool-name">{{ t.name }}</td>
                     <td class="tool-phase">{{ t.phase }}</td>
@@ -299,6 +306,15 @@
               </tbody>
             </table>
           </div>
+          @if (hasMoreTools()) {
+            <button type="button" class="view-more-btn" (click)="toggleShowAllTools()">
+              @if (!showAllTools()) {
+                View all tools ({{ hiddenToolCount() }} more) <span class="arrow">↓</span>
+              } @else {
+                Show less <span class="arrow">↑</span>
+              }
+            </button>
+          }
         </div>
 
         <!-- Constraints -->
