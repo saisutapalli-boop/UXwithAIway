@@ -44,6 +44,7 @@ import { AuthService } from '../../../core/services/auth.service';
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: link.href === '/' }"
               class="menu-link"
+              [class.futuristic-link]="link.futuristic"
               (click)="close()"
             >{{ link.label }}</a>
           }
@@ -77,7 +78,7 @@ export class MobileMenuComponent {
   readonly authService = inject(AuthService);
 
   @Input() isOpen = false;
-  @Input() links: { href: string; label: string }[] = [];
+  @Input() links: { href: string; label: string; futuristic?: boolean }[] = [];
   @Output() closed = new EventEmitter<void>();
 
   close(): void {

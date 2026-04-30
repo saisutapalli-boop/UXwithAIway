@@ -88,6 +88,12 @@
     background: var(--bg-tertiary);
     color: var(--accent-primary);
   }
+
+  &.futuristic-link {
+    background: rgba(0, 164, 239, 0.08);
+    color: #00A4EF;
+    font-weight: 700;
+  }
 }
 
 .menu-auth {

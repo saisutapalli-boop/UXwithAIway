@@ -66,6 +66,18 @@
     background: var(--bg-tertiary);
     color: var(--accent-primary);
   }
+
+  &.futuristic-link {
+    background: rgba(0, 164, 239, 0.08);
+    border: 1px solid rgba(0, 164, 239, 0.2);
+    color: #00A4EF;
+    font-weight: 700;
+    
+    &:hover {
+      background: #00A4EF;
+      color: #fff;
+    }
+  }
 }
 
 .admin-nav-link {

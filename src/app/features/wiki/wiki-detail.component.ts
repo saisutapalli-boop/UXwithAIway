@@ -4,13 +4,12 @@ import { ContentService } from '../../core/services/content.service';
 import { WikiSectionContent } from '../../core/models/wiki-section.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/services/auth.service';
-
-type WikiVideo = { title: string; watchUrl: string; thumbUrl: string };
+import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/youtube-embed.component';
 
 @Component({
   selector: 'app-wiki-detail',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, YoutubeEmbedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (section(); as s) {
@@ -111,26 +110,16 @@ type WikiVideo = { title: string; watchUrl: string; thumbUrl: string };
             </div>
 
             <!-- Videos -->
-            <div class="content-block">
-              <h2 class="content-heading">Watch It In Action</h2>
-              <div class="videos-grid">
-                @for (v of wikiVideos(); track v.watchUrl) {
-                  <a [href]="v.watchUrl" target="_blank" rel="noopener noreferrer" class="video-card">
-                    <div class="video-thumb-wrap">
-                      <img [src]="v.thumbUrl" [alt]="v.title" class="video-thumb" loading="lazy" />
-                      <div class="video-play-overlay">
-                        <svg class="play-icon" viewBox="0 0 68 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect width="68" height="48" rx="12" fill="rgba(0,0,0,0.7)"/>
-                          <path d="M26 15L50 24L26 33V15Z" fill="white"/>
-                        </svg>
-                      </div>
-                      <div class="video-watch-label">Watch on YouTube ↗</div>
-                    </div>
-                    <p class="video-item-title">{{ v.title }}</p>
-                  </a>
-                }
+            @if (c.videos && c.videos.length > 0) {
+              <div class="content-block">
+                <h2 class="content-heading">Watch It In Action</h2>
+                <div class="videos-grid">
+                  @for (v of c.videos; track v.url) {
+                    <app-youtube-embed [url]="v.url" [title]="v.title" />
+                  }
+                </div>
               </div>
-            </div>
+            }
 
             <!-- Resources -->
             @if (c.resources && c.resources.length > 0) {
@@ -491,81 +480,8 @@ type WikiVideo = { title: string; watchUrl: string; thumbUrl: string };
 
     .videos-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .video-card {
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border-radius: var(--radius-md);
-      transition: transform 0.2s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-
-        .video-watch-label { opacity: 1; }
-        .video-thumb { transform: scale(1.03); }
-        .play-icon rect { fill: rgba(177,0,14,0.85); }
-      }
-    }
-
-    .video-thumb-wrap {
-      position: relative;
-      aspect-ratio: 16 / 9;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-    }
-
-    .video-thumb {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-
-    .video-play-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .play-icon {
-      width: 60px;
-      height: 42px;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
-      transition: all 0.2s ease;
-    }
-
-    .video-watch-label {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 8px 12px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.75));
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      text-align: right;
-    }
-
-    .video-item-title {
-      font-size: 0.83rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      line-height: 1.45;
-      margin: 0;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
     }
 
     .resources-list {
@@ -624,10 +540,6 @@ type WikiVideo = { title: string; watchUrl: string; thumbUrl: string };
     @media (max-width: 768px) {
       .videos-grid {
         grid-template-columns: 1fr;
-      }
-
-      .video-item-title {
-        min-height: unset;
       }
     }
 
@@ -947,19 +859,6 @@ export class WikiDetailComponent implements OnInit {
   readonly sectionContent = computed((): WikiSectionContent | undefined => {
     const s = this.slug();
     return s ? this.content.getWikiSectionContent(s) : undefined;
-  });
-
-  readonly wikiVideos = computed((): WikiVideo[] => {
-    const raw = this.sectionContent();
-    if (!raw?.videos?.length) return [];
-    return raw.videos.map(v => {
-      const id = v.url.split('/embed/')[1]?.split('?')[0] ?? '';
-      return {
-        title: v.title,
-        watchUrl: `https://www.youtube.com/watch?v=${id}`,
-        thumbUrl: `https://img.youtube.com/vi/${id}/mqdefault.jpg`,
-      };
-    });
   });
 
   readonly prevSection = computed(() => {

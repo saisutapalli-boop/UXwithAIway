@@ -22,14 +22,14 @@ import { RouterLink } from '@angular/router';
         </div>
 
         <h1 class="animate-fade-in" style="animation-delay: 0.2s">
-          The UX Strategy Builder
+          The <span class="highlight">Sustainable</span> UX Builder
           <br />
-          <span class="subtitle-span">for AI-native workflows.</span>
+          <span class="subtitle-span">for Investor-Friendly AI.</span>
         </h1>
 
         <p class="hero-subtitle animate-fade-in" style="animation-delay: 0.3s">
-          Answer three prompts. Get a tailored workflow, a curated AI tool stack,
-          and an action plan you can ship to stakeholders — in minutes, not weeks.
+          Futuristic AI strategies with built-in Carbon Tracking. Get a tailored workflow, 
+          ROI projections, and ESG-ready reports for your stakeholders in minutes.
         </p>
 
         <div class="hero-ctas animate-fade-in" style="animation-delay: 0.4s">
@@ -44,18 +44,18 @@ import { RouterLink } from '@angular/router';
 
         <div class="proof-strip animate-fade-in" style="animation-delay: 0.5s">
           <div class="proof-stat">
-            <div class="proof-num">3 min</div>
-            <div class="proof-label">to a complete strategy</div>
+            <div class="proof-num">0.0g</div>
+            <div class="proof-label">Carbon per session</div>
           </div>
           <div class="proof-divider"></div>
           <div class="proof-stat">
-            <div class="proof-num">26</div>
-            <div class="proof-label">UX workflow stages</div>
+            <div class="proof-num">ESG</div>
+            <div class="proof-label">Investor Ready</div>
           </div>
           <div class="proof-divider"></div>
           <div class="proof-stat">
-            <div class="proof-num">50+</div>
-            <div class="proof-label">curated AI tools</div>
+            <div class="proof-num">300%</div>
+            <div class="proof-label">Potential ROI</div>
           </div>
           <div class="proof-divider"></div>
           <div class="proof-stat">

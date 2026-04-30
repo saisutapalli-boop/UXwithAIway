@@ -9,7 +9,7 @@
   </div>
 </section>
 
-<!-- Progress Bar (3 steps; all show ✓ completed when on the output view) -->
+<!-- Progress Bar -->
 <div class="sb-progress">
   <div class="container progress-track">
     @for (label of stepLabels; track label; let i = $index) {
@@ -38,9 +38,9 @@
 <section class="section-padding sb-content">
   <div class="container sb-container">
 
-    <!-- Guest warning banner (shown on all steps when not signed in) -->
+    <!-- Guest warning banner -->
     @if (!isLoggedIn()) {
-      <div class="guest-banner">
+      <div class="guest-banner" role="alert">
         <span class="guest-banner-text">
           <span class="guest-banner-icon">&#9888;</span>
           Not signed in. Your strategy will be lost if you refresh or navigate away.
@@ -55,21 +55,26 @@
         <h2 class="step-title">Step 1: Problem Framing</h2>
 
         <div class="form-group">
-          <label class="form-label">What is the core problem you've been asked to solve?</label>
+          <label class="form-label" for="problem-input">What is the core problem you've been asked to solve?</label>
           <textarea
+            id="problem-input"
             class="form-textarea"
             [value]="problem()"
             (input)="problem.set($any($event.target).value)"
             placeholder="Describe the problem you're tackling..."
+            aria-required="true"
           ></textarea>
         </div>
 
         <div class="form-group-lg">
           <label class="form-label">Who identified this problem?</label>
-          <div class="option-row">
+          <div class="option-row" role="radiogroup" aria-label="Problem Source">
             @for (opt of ['Business / Client', 'End Users', 'Both']; track opt) {
               <button
+                type="button"
                 class="option-btn"
+                role="radio"
+                [attr.aria-checked]="problemSource() === opt"
                 [class.selected]="problemSource() === opt"
                 (click)="problemSource.set(opt)"
               >
@@ -78,14 +83,13 @@
             }
           </div>
           @if (problemSource()) {
-            <p class="hint-box">{{ problemSourceHint() }}</p>
+            <p class="hint-box" role="status">{{ problemSourceHint() }}</p>
           }
         </div>
 
         <button
           class="btn-primary"
           [disabled]="!canProceedStep1()"
-          [class.disabled]="!canProceedStep1()"
           (click)="goToStep(2)"
         >
           Continue to Project Matrix &rarr;
@@ -101,10 +105,13 @@
         @for (axis of matrixAxes(); track axis.label) {
           <div class="form-group">
             <label class="form-label">{{ axis.label }}</label>
-            <div class="option-row">
+            <div class="option-row" role="radiogroup" [attr.aria-label]="axis.label">
               @for (opt of axis.options; track opt) {
                 <button
+                  type="button"
                   class="option-btn sm"
+                  role="radio"
+                  [attr.aria-checked]="axis.value() === opt"
                   [class.selected]="axis.value() === opt"
                   (click)="axis.setter(opt)"
                 >
@@ -120,7 +127,6 @@
           <button
             class="btn-primary"
             [disabled]="!canProceedStep2()"
-            [class.disabled]="!canProceedStep2()"
             (click)="goToStep(3)"
           >
             Continue to Stage Selection &rarr;
@@ -137,30 +143,36 @@
           Recommended stages are pre-selected based on your project context. Toggle stages on/off, or use the controls below.
         </p>
 
-        <!-- Search + controls bar -->
         <div class="stage-controls">
-          <input
-            type="text"
-            class="stage-search-input"
-            [value]="stageSearch()"
-            (input)="stageSearch.set($any($event.target).value)"
-            placeholder="Search stages…"
-          />
+          <div class="form-group">
+            <label class="form-label" for="stage-search">Search Stages</label>
+            <input
+              id="stage-search"
+              type="text"
+              class="stage-search-input"
+              [value]="stageSearch()"
+              (input)="stageSearch.set($any($event.target).value)"
+              placeholder="Search stages…"
+              aria-label="Search UX stages"
+            />
+          </div>
           <div class="stage-select-btns">
-            <button class="stage-select-btn" (click)="selectAll()">
+            <button type="button" class="stage-select-btn" (click)="selectAll()">
               &#10003; Select All
             </button>
-            <button class="stage-select-btn" (click)="deselectAll()">
+            <button type="button" class="stage-select-btn" (click)="deselectAll()">
               &#10005; Deselect All
             </button>
-            <span class="stage-count-badge">{{ selectedStages().length }} / {{ allStages.length }} selected</span>
+            <span class="stage-count-badge" role="status">{{ selectedStages().length }} / {{ allStages.length }} selected</span>
           </div>
         </div>
 
-        <div class="stage-grid">
+        <div class="stage-grid" role="group" aria-label="UX Stages Selection">
           @for (stage of filteredStages(); track stage) {
             <button
+              type="button"
               class="stage-card"
+              [attr.aria-pressed]="selectedStages().includes(stage)"
               [class.selected]="selectedStages().includes(stage)"
               (click)="toggleStage(stage)"
             >
@@ -168,6 +180,7 @@
                 <div
                   class="stage-checkbox"
                   [class.checked]="selectedStages().includes(stage)"
+                  aria-hidden="true"
                 >
                   @if (selectedStages().includes(stage)) {
                     <span>&#10003;</span>
@@ -184,7 +197,7 @@
             </button>
           }
           @if (filteredStages().length === 0) {
-            <div class="stage-empty">
+            <div class="stage-empty" role="status">
               No stages match &ldquo;{{ stageSearch() }}&rdquo;.
             </div>
           }
@@ -199,11 +212,10 @@
       </div>
     }
 
-    <!-- Step 4: Strategy Output (Full Preview Page) -->
+    <!-- Step 4: Strategy Output -->
     @if (step() === 4) {
       <div class="animate-fade-in">
 
-        <!-- Personalised heading (signed-in) -->
         @if (isLoggedIn() && currentUser()) {
           <div class="strategy-owner">
             @if (currentUser()!.photoURL) {
@@ -213,7 +225,7 @@
                 class="strategy-owner-avatar"
               />
             } @else {
-              <div class="strategy-owner-avatar-placeholder">
+              <div class="strategy-owner-avatar-placeholder" aria-hidden="true">
                 {{ (currentUser()!.displayName || currentUser()!.email || 'U').charAt(0).toUpperCase() }}
               </div>
             }
@@ -224,9 +236,8 @@
           </div>
         }
 
-        <!-- Guest save warning (on output page) -->
         @if (!isLoggedIn()) {
-          <div class="guest-save-banner">
+          <div class="guest-save-banner" role="alert">
             <span class="guest-save-icon">&#9888;</span>
             <div class="guest-save-body">
               <strong>Your strategy is not saved.</strong>
@@ -255,19 +266,19 @@
           <div class="workflow-list">
             @for (stage of selectedStages(); track stage; let i = $index) {
               <div class="workflow-item">
-                <span class="workflow-num">{{ i + 1 }}</span>
+                <span class="workflow-num" aria-hidden="true">{{ i + 1 }}</span>
                 <span class="workflow-name">{{ stage }}</span>
               </div>
             }
           </div>
         </div>
 
-        <!-- AI Tool Stack -->
+        <!-- Tool Stack -->
         <div class="card output-card">
           <div class="tool-stack-header">
             <h3 class="card-title">AI Tool Stack</h3>
             @if (toolStack().length > 0) {
-              <span class="tool-count">
+              <span class="tool-count" role="status">
                 Showing {{ visibleToolStack().length }} of {{ toolStack().length }}
               </span>
             }
@@ -276,11 +287,11 @@
             <table class="tool-table">
               <thead>
                 <tr>
-                  <th class="text-left">Tool</th>
-                  <th class="text-left">Phase</th>
-                  <th class="text-center">Free Tier</th>
-                  <th class="text-center">Client-Safe</th>
-                  <th class="text-center">Time Saving</th>
+                  <th scope="col" class="text-left">Tool</th>
+                  <th scope="col" class="text-left">Phase</th>
+                  <th scope="col" class="text-center">Free Tier</th>
+                  <th scope="col" class="text-center">Client-Safe</th>
+                  <th scope="col" class="text-center">Time Saving</th>
                 </tr>
               </thead>
               <tbody>
@@ -309,9 +320,9 @@
           @if (hasMoreTools()) {
             <button type="button" class="view-more-btn" (click)="toggleShowAllTools()">
               @if (!showAllTools()) {
-                View all tools ({{ hiddenToolCount() }} more) <span class="arrow">↓</span>
+                View all tools ({{ hiddenToolCount() }} more) <span aria-hidden="true">↓</span>
               } @else {
-                Show less <span class="arrow">↑</span>
+                Show less <span aria-hidden="true">↑</span>
               }
             </button>
           }
@@ -329,7 +340,7 @@
           </div>
         }
 
-        <!-- AI Strategy Insights (Gemini) -->
+        <!-- AI Insights -->
         <div class="card output-card ai-insights-card">
           <div class="ai-insights-header">
             <div class="ai-insights-title-row">
@@ -337,18 +348,18 @@
               <h3 class="card-title">AI Strategy Insights</h3>
             </div>
             @if (!aiInsightsLoading() && !aiInsightsError() && aiInsights()) {
-              <button class="ai-refresh-btn" (click)="generateAIInsights()" title="Regenerate insights">&#8635; Refresh</button>
+              <button type="button" class="ai-refresh-btn" (click)="generateAIInsights()" title="Regenerate insights">&#8635; Refresh</button>
             }
           </div>
           @if (aiInsightsLoading()) {
-            <div class="ai-loading">
+            <div class="ai-loading" role="status">
               <div class="ai-loading-dots"><span></span><span></span><span></span></div>
               <p class="ai-loading-text">Generating personalised insights for your project...</p>
             </div>
           } @else if (aiInsightsError()) {
-            <div class="ai-error">
+            <div class="ai-error" role="alert">
               <p>Unable to generate AI insights at this time.</p>
-              <button class="ai-retry-btn" (click)="generateAIInsights()">Try Again</button>
+              <button type="button" class="ai-retry-btn" (click)="generateAIInsights()">Try Again</button>
             </div>
           } @else if (aiInsights()) {
             <div class="ai-insights-content">
@@ -395,42 +406,40 @@
           <div class="reading-list">
             @for (article of readingPath(); track article.slug; let i = $index) {
               <a [routerLink]="['/wiki', article.slug]" class="reading-link">
-                <span class="reading-num">{{ i + 1 }}.</span>
+                <span class="reading-num" aria-hidden="true">{{ i + 1 }}.</span>
                 <span class="reading-title">{{ article.title }}</span>
-                <span class="reading-arrow">&rarr;</span>
+                <span class="reading-arrow" aria-hidden="true">&rarr;</span>
               </a>
             }
           </div>
         </div>
 
-        <!-- Export to Google Slides -->
+        <!-- Export -->
         <div class="card output-card slides-export-card">
           <div class="slides-export-header">
             <div>
               <h3 class="card-title">Export to Google Slides</h3>
               <p class="slides-export-desc">
-                Generate a full strategy presentation, including problem framing, workflow, tool stack, constraints, and a 3-phase action plan, which will be ready to open in Google Slides.
+                Generate a full strategy presentation deck ready for Google Slides.
               </p>
             </div>
             <div class="slides-badge">
-              <span class="slides-count">{{ slides().length }} slides</span>
+              <span class="slides-count" role="status">{{ slides().length }} slides</span>
             </div>
           </div>
 
-          <!-- Slide preview: open button shown only when closed -->
           @if (!showSlidePreview()) {
-            <button class="slides-preview-toggle" (click)="showSlidePreview.set(true)">
+            <button type="button" class="slides-preview-toggle" (click)="showSlidePreview.set(true)">
               &#9660; Preview Slides
             </button>
           }
 
-          <!-- Slide preview panel: stopPropagation prevents scroll-click from closing it -->
           @if (showSlidePreview()) {
-            <div class="slides-preview-panel" (click)="$event.stopPropagation()">
+            <div class="slides-preview-panel">
               <div class="slides-preview-panel-header">
                 <span class="slides-preview-panel-label">Slide Preview: {{ slides().length }} slides</span>
-                <button class="slides-preview-close" (click)="showSlidePreview.set(false)">
-                  &#10005; Close Preview
+                <button type="button" class="slides-preview-close" (click)="showSlidePreview.set(false)">
+                  &#10005; Close
                 </button>
               </div>
               <div class="slides-preview-grid">
@@ -438,49 +447,27 @@
                   <div class="slide-thumb">
                     <div class="slide-thumb-num">{{ i + 1 }}</div>
                     <div class="slide-thumb-title">{{ slide.title }}</div>
-                    @if (slide.subtitle) {
-                      <div class="slide-thumb-sub">{{ slide.subtitle }}</div>
-                    }
-                    @if (slide.bullets.length > 0) {
-                      <ul class="slide-thumb-bullets">
-                        @for (b of slide.bullets.slice(0, 3); track b) {
-                          <li>{{ b }}</li>
-                        }
-                        @if (slide.bullets.length > 3) {
-                          <li class="slide-thumb-more">+{{ slide.bullets.length - 3 }} more</li>
-                        }
-                      </ul>
-                    }
                   </div>
                 }
               </div>
             </div>
           }
 
-          <!-- How-to steps -->
           <div class="slides-steps">
             <div class="slides-step"><span class="slides-step-num">1</span>Copy the Apps Script below</div>
-            <div class="slides-step"><span class="slides-step-num">2</span>Open <strong>script.google.com</strong> → New project</div>
-            <div class="slides-step"><span class="slides-step-num">3</span>Paste and click ▶ Run to create a Google Slides deck</div>
+            <div class="slides-step"><span class="slides-step-num">2</span>Open <strong>script.google.com</strong></div>
+            <div class="slides-step"><span class="slides-step-num">3</span>Paste and click ▶ Run</div>
           </div>
 
-          <button class="btn-slides" (click)="copyScript()">
+          <button type="button" class="btn-slides" (click)="copyScript()">
             @if (scriptCopied()) {
               <span>&#10003; Copied!</span>
             } @else {
               <span>&#128203; Copy Google Apps Script</span>
             }
           </button>
-
-          <a
-            href="https://script.google.com"
-            target="_blank"
-            rel="noopener"
-            class="slides-open-link"
-          >Open script.google.com &rarr;</a>
         </div>
 
-        <!-- Actions -->
         <div class="btn-row">
           <button class="btn-secondary" (click)="goToStep(3)">&larr; Edit Stages</button>
           <button class="btn-secondary" (click)="resetAll()">Start Over</button>

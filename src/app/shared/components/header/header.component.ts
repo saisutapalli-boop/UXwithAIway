@@ -8,6 +8,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export interface NavLink {
   href: string;
   label: string;
+  futuristic?: boolean;
 }
 
 @Component({
@@ -28,12 +29,7 @@ export interface NavLink {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" width="36" height="36" aria-hidden="true" class="logo-icon">
             <rect width="40" height="40" rx="9" fill="#b1000e"/>
             <path d="M9 9 L9 22 Q9 32 20 32 Q31 32 31 22 L31 9" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="14.5" y1="18.5" x2="25.5" y2="18.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round"/>
-            <line x1="14.5" y1="18.5" x2="20" y2="26.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round"/>
-            <line x1="25.5" y1="18.5" x2="20" y2="26.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round"/>
-            <circle cx="14.5" cy="18.5" r="2.3" fill="white"/>
-            <circle cx="25.5" cy="18.5" r="2.3" fill="white"/>
-            <circle cx="20" cy="26.5" r="2.3" fill="white"/>
+            <circle cx="20" cy="20" r="12" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
           </svg>
           <span class="logo-text">UXwithAIway</span>
         </a>
@@ -45,6 +41,7 @@ export interface NavLink {
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: link.href === '/' }"
               class="nav-link"
+              [class.futuristic-link]="link.futuristic"
             >{{ link.label }}</a>
           }
           @if (isAdmin()) {
@@ -87,10 +84,11 @@ export class HeaderComponent {
   mobileOpen = false;
 
   readonly navLinks: NavLink[] = [
-    { href: '/strategy-builder', label: 'Strategy Builder' },
-    { href: '/wiki', label: 'Wiki' },
-    { href: '/tools', label: 'Tools' },
-    { href: '/about', label: 'About' },
+    { href: '/strategy-builder', label: 'AI Builder', futuristic: true },
+    { href: '/wiki', label: 'Practitioner Wiki' },
+    { href: '/tools', label: 'Futuristic Tools' },
+    { href: '/', label: 'ROI Analysis' },
+    { href: '/about', label: 'Our Approach' },
   ];
 
   readonly isAdmin = computed(() => this.authService.user()?.email === 'sai.sutapalli@globallogic.com');

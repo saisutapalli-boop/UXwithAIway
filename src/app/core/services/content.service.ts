@@ -176,7 +176,7 @@ export class ContentService {
       resources: [
         { title: 'Attention Is All You Need - Original Transformer Paper (2017)', url: 'https://arxiv.org/abs/1706.03762' },
         { title: 'Nielsen Norman Group - AI in UX Design: Current State', url: 'https://www.nngroup.com/articles/ai-ux/' },
-        { title: 'Andrej Karpathy - Intro to Large Language Models (YouTube)', url: 'https://www.youtube.com/watch?v=zjkBMFhNj_g' },
+        { title: 'Andrej Karpathy - Intro to Large Language Models (YouTube)', url: 'https://www.youtube.com/embed/zjkBMFhNj_g' },
         { title: 'AI Hallucination Explained - IBM Research', url: 'https://research.ibm.com/blog/ai-hallucinations' },
       ],
     },

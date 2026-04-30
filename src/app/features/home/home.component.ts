@@ -3,6 +3,7 @@ import { HeroSectionComponent } from './sections/hero-section.component';
 import { FeaturesSectionComponent } from './sections/features-section.component';
 import { ImpactMetricsSectionComponent } from './sections/impact-metrics-section.component';
 import { CtaSectionComponent } from './sections/cta-section.component';
+import { RoiSectionComponent } from './sections/roi-section.component';
 
 @Component({
   selector: 'app-home',
@@ -11,6 +12,7 @@ import { CtaSectionComponent } from './sections/cta-section.component';
     HeroSectionComponent,
     FeaturesSectionComponent,
     ImpactMetricsSectionComponent,
+    RoiSectionComponent,
     CtaSectionComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
